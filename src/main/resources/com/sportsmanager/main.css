@@ -1,0 +1,256 @@
+.root {
+    -fx-background-color: #1a1a2e;
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.title-text {
+    -fx-fill: #ffffff;
+    -fx-font-size: 32px;
+    -fx-font-weight: bold;
+}
+.subtitle-text {
+    -fx-fill: #aaaaaa;
+    -fx-font-size: 16px;
+}
+.view-title {
+    -fx-fill: #ffffff;
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+}
+.form-label {
+    -fx-text-fill: #aaaaaa;
+    -fx-font-size: 13px;
+}
+.info-text {
+    -fx-text-fill: #aaaaaa;
+    -fx-font-size: 14px;
+}
+
+.primary-button {
+    -fx-background-color: #e94560;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 25;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+}
+.primary-button:hover {
+    -fx-background-color: #c73652;
+}
+
+.sidebar {
+    -fx-background-color: #16213e;
+    -fx-border-color: #0f3460;
+    -fx-border-width: 0 1 0 0;
+}
+.nav-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #aaaaaa;
+    -fx-font-size: 13px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 10 15;
+    -fx-background-radius: 4;
+    -fx-cursor: hand;
+}
+.nav-button:hover {
+    -fx-background-color: #0f3460;
+    -fx-text-fill: #ffffff;
+}
+
+.top-bar {
+    -fx-background-color: #16213e;
+    -fx-border-color: #0f3460;
+    -fx-border-width: 0 0 1 0;
+}
+.top-title {
+    -fx-fill: #ffffff;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+.info-badge {
+    -fx-background-color: #0f3460;
+    -fx-text-fill: #aaaaaa;
+    -fx-padding: 4 10;
+    -fx-background-radius: 12;
+    -fx-font-size: 12px;
+}
+.team-badge {
+    -fx-background-color: #e94560;
+    -fx-text-fill: #ffffff;
+    -fx-padding: 4 10;
+    -fx-background-radius: 12;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+.points-badge {
+    -fx-background-color: #0f3460;
+    -fx-text-fill: #e94560;
+    -fx-padding: 4 10;
+    -fx-background-radius: 12;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.info-card {
+    -fx-background-color: #16213e;
+    -fx-background-radius: 8;
+    -fx-border-color: #0f3460;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+}
+.card-title {
+    -fx-text-fill: #aaaaaa;
+    -fx-font-size: 12px;
+}
+.card-value {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+}
+
+.content-area {
+    -fx-background-color: #1a1a2e;
+}
+
+.table-view {
+    -fx-background-color: #16213e;
+    -fx-border-color: #0f3460;
+    -fx-border-radius: 6;
+}
+.table-view .column-header {
+    -fx-background-color: #0f3460;
+}
+.table-view .column-header .label {
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+.table-view .table-row-cell {
+    -fx-background-color: #16213e;
+    -fx-text-fill: #ffffff;
+    -fx-border-color: transparent transparent #0f3460 transparent;
+}
+.table-view .table-row-cell:odd {
+    -fx-background-color: #1a1a2e;
+}
+.table-view .table-row-cell:hover {
+    -fx-background-color: #0f3460;
+}
+.table-view .table-cell {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 13px;
+}
+.managed-team-row {
+    -fx-background-color: #0f3460 !important;
+    -fx-border-color: #e94560 !important;
+}
+
+.fixture-scroll {
+    -fx-background-color: #1a1a2e;
+}
+.week-box {
+    -fx-background-color: #16213e;
+    -fx-background-radius: 6;
+    -fx-border-color: #0f3460;
+    -fx-border-radius: 6;
+    -fx-border-width: 1;
+}
+.current-week-box {
+    -fx-background-color: #16213e;
+    -fx-background-radius: 6;
+    -fx-border-color: #e94560;
+    -fx-border-radius: 6;
+    -fx-border-width: 2;
+}
+.week-header {
+    -fx-text-fill: #e94560;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+}
+.match-row {
+    -fx-background-color: transparent;
+    -fx-background-radius: 4;
+}
+.managed-match-row {
+    -fx-background-color: #0f3460;
+    -fx-background-radius: 4;
+}
+.team-name {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 13px;
+}
+.score-label {
+    -fx-text-fill: #e94560;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-alignment: center;
+}
+.vs-label {
+    -fx-text-fill: #aaaaaa;
+    -fx-font-size: 13px;
+    -fx-alignment: center;
+}
+
+.match-card {
+    -fx-background-color: #16213e;
+    -fx-background-radius: 12;
+    -fx-border-color: #0f3460;
+    -fx-border-radius: 12;
+    -fx-border-width: 1;
+}
+.vs-text {
+    -fx-fill: #e94560;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+.match-side-label {
+    -fx-text-fill: #aaaaaa;
+    -fx-font-size: 11px;
+}
+.match-team-name {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+.managed-team-highlight {
+    -fx-text-fill: #e94560;
+}
+.big-score {
+    -fx-fill: #ffffff;
+    -fx-font-size: 52px;
+    -fx-font-weight: bold;
+}
+.match-teams-text {
+    -fx-fill: #aaaaaa;
+    -fx-font-size: 14px;
+}
+.outcome-text {
+    -fx-fill: #e94560;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+.champion-text {
+    -fx-fill: #e94560;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+
+.combo-box, .text-field {
+    -fx-background-color: #0f3460;
+    -fx-text-fill: #ffffff;
+    -fx-prompt-text-fill: #aaaaaa;
+    -fx-border-color: #e94560;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+}
+.combo-box .list-cell {
+    -fx-text-fill: #ffffff;
+    -fx-background-color: #0f3460;
+}
+.combo-box-popup .list-view {
+    -fx-background-color: #0f3460;
+}
+.combo-box-popup .list-cell:hover {
+    -fx-background-color: #e94560;
+}
