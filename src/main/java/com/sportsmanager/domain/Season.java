@@ -5,67 +5,41 @@ import java.util.List;
 public class Season {
 
     private int seasonNumber;
-    private int weekIndex;
-    private League leagueRef;
-    private boolean completed;
+    private int currentWeek;
+    private League league;
+    private boolean finished;
 
-    public Season(int seasonNumber, League leagueRef) {
+    public Season(int seasonNumber, League league) {
         this.seasonNumber = seasonNumber;
-        this.leagueRef = leagueRef;
-        this.weekIndex = 1;
-        this.completed = false;
+        this.currentWeek = 1;
+        this.league = league;
+        this.finished = false;
     }
 
-    public void nextWeek() {
+    public void advanceWeek() {
+        if (finished) return;
 
-        if (completed) return;
-
-        List<Match> roundMatches = leagueRef.getFixture().getMatchesForRound(weekIndex);
-
-        if (roundMatches != null) {
-            for (Match matchObj : roundMatches) {
-
-                matchObj.simulate();
-
-                if (matchObj.isPlayed()) {
-                    leagueRef.updateStandings(matchObj);
-                }
-            }
+        List<Match> matches = league.getFixture().getMatchesForRound(currentWeek);
+        for (Match match : matches) {
+            match.simulate();
+            league.updateStandings(match);
         }
 
-        int maxWeeks = leagueRef.getFixture().getTotalRounds();
-
-        if (weekIndex >= maxWeeks) {
-            completed = true;
+        if (currentWeek >= league.getFixture().getTotalRounds()) {
+            finished = true;
         } else {
-            weekIndex++;
+            currentWeek++;
         }
     }
 
-    public boolean isFinished() {
-        return completed;
-    }
-
-    public int getCurrentWeek() {
-        return weekIndex;
-    }
-
-    public int getSeasonNumber() {
-        return seasonNumber;
-    }
-
-    public League getLeague() {
-        return leagueRef;
-    }
+    public boolean isFinished() { return finished; }
+    public int getCurrentWeek() { return currentWeek; }
+    public int getSeasonNumber() { return seasonNumber; }
+    public League getLeague() { return league; }
 
     public Team getLeader() {
-
-        List<StandingEntry> list = leagueRef.getSortedStandings();
-
-        if (list == null || list.isEmpty()) {
-            return null;
-        }
-
-        return list.get(0).getTeam();
+        List<StandingEntry> standings = league.getSortedStandings();
+        if (standings.isEmpty()) return null;
+        return standings.get(0).getTeam();
     }
 }
