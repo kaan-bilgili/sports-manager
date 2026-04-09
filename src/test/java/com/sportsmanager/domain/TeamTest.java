@@ -19,7 +19,7 @@ class TeamTest {
         assertEquals(0, team.getPlayers().size());
         team.addPlayer(new TestPlayer("Ali", 25, 80));
         team.addPlayer(new TestPlayer("Veli", 23, 70));
-        assertEquals(3, team.getPlayers().size()); // BUG: 2 değil 3 yazdım
+        assertEquals(2, team.getPlayers().size());
     }
     @Test
     // T5: Yaralı oyuncu available listesine girmez
@@ -30,7 +30,7 @@ class TeamTest {
         p2.setInjuryGamesRemaining(2);
         team.addPlayer(p1);
         team.addPlayer(p2);
-        assertEquals(2, team.getAvailablePlayers().size()); // BUG: injured'ı filtrelemedi
+        assertEquals(1, team.getAvailablePlayers().size());
         assertEquals("Ali", team.getAvailablePlayers().get(0).getName());
     }
 }
