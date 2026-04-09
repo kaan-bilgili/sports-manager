@@ -54,15 +54,10 @@ public class League {
     public List<StandingEntry> getSortedStandings() {
         List<StandingEntry> list = new ArrayList<>(standings.values());
 
-        list.sort((a, b) -> {
-            if (b.getPoints() != a.getPoints()) {
-                return b.getPoints() - a.getPoints();
-            } else if (b.getGoalDifference() != a.getGoalDifference()) {
-                return b.getGoalDifference() - a.getGoalDifference();
-            } else {
-                return b.getGoalsFor() - a.getGoalsFor();
-            }
-        });
+        list.sort(Comparator
+            .comparingInt(StandingEntry::getPoints).reversed()
+            .thenComparingInt(StandingEntry::getGoalDifference).reversed()
+            .thenComparingInt(StandingEntry::getGoalsFor).reversed());
 
         return list;
     }
