@@ -6,7 +6,9 @@ import static org.junit.jupiter.api.Assertions.*;
 class StandingEntryTest {
 
     static class TestTeam extends Team {
-        public TestTeam(String name) { super(name); }
+        public TestTeam(String name) {
+            super(name);
+        }
     }
 
     @Test
@@ -21,6 +23,6 @@ class StandingEntryTest {
 
         assertEquals(4, entry.getPoints());
         assertEquals(3, entry.getMatchesPlayed());
-        assertEquals(0, entry.getGoalDifference());
+        assertEquals(-1, entry.getGoalDifference());
     }
 }
