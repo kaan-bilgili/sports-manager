@@ -25,7 +25,9 @@ public class FootballSport implements Sport {
 
     @Override
     public Player createPlayer(String name, int age, int skillLevel) {
-        return new FootballPlayer(name, age, skillLevel, FootballPlayer.Position.FORWARD);
+        FootballPlayer.Position[] positions = FootballPlayer.Position.values();
+        FootballPlayer.Position position = positions[random.nextInt(positions.length)];
+        return new FootballPlayer(name, age, skillLevel, position);
     }
 
     @Override
