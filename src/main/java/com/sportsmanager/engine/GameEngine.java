@@ -2,33 +2,36 @@ package com.sportsmanager.engine;
 
 import com.sportsmanager.domain.League;
 import com.sportsmanager.domain.StandingEntry;
+import com.sportsmanager.football.FootballSport;
 
 public class GameEngine {
 
-    private League currentLeague;
+    private GameFacade facade;
 
     public void startDemo() {
-        System.out.println("=== Sports Manager - Game Engine ===");
-        System.out.println("Domain katmani yuklendi.");
-        System.out.println("Fixture, League, Season hazir.");
+        System.out.println("=== Sports Manager v1.0 ===");
+
+        facade = new GameFacade(new FootballSport());
+        facade.initGame(6);
+
+        System.out.println("\nSimulating full season...");
+        while (!facade.isSeasonFinished()) {
+            facade.advanceWeek();
+        }
+
+        facade.printStandings();
+
+        System.out.println("\n=== Season Champion ===");
+        System.out.println(facade.getLeader().getName());
     }
 
     public void setLeague(League league) {
-        this.currentLeague = league;
-    }
-
-    public League getCurrentLeague() {
-        return currentLeague;
+        // kept for compatibility
     }
 
     public void printStandings() {
-        if (currentLeague == null) {
-            System.out.println("Lig bulunamadi.");
-            return;
-        }
-        System.out.println("\n=== " + currentLeague.getName() + " Standings ===");
-        for (StandingEntry entry : currentLeague.getSortedStandings()) {
-            System.out.println(entry);
+        if (facade != null) {
+            facade.printStandings();
         }
     }
 }
