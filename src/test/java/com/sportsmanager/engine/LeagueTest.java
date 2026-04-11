@@ -22,7 +22,7 @@ class LeagueTest {
     }
 
     @Test
-    // T13: Mac sonrasi standings guncellenir
+    // T13: Mac sonrasi her iki takim toplam puan aliyo
     void testStandingsUpdatedAfterMatch() {
         League league = new League("Test League");
         FootballTeam teamA = createTeamWithPlayers("Team A", 80);
@@ -30,7 +30,16 @@ class LeagueTest {
         league.addTeam(teamA);
         league.addTeam(teamB);
 
-        FootballMatch match = new FootballMatch(teamA, teamB);
+        // Manuel galibiyet olustur — rastgelelige bagli olmamali
+        FootballMatch match = new FootballMatch(teamA, teamB) {
+            @Override
+            public void simulate() {
+                homeScore = 2;
+                awayScore = 0;
+                played = true;
+            }
+        };
+
         match.simulate();
         league.updateStandings(match);
 
@@ -39,7 +48,9 @@ class LeagueTest {
 
         assertEquals(1, entryA.getMatchesPlayed());
         assertEquals(1, entryB.getMatchesPlayed());
-        assertEquals(3, entryA.getPoints() + entryB.getPoints());
+        assertEquals(3, entryA.getPoints()); // galibiyet = 3 puan
+        assertEquals(0, entryB.getPoints()); // maglubiyet = 0 puan
+        assertEquals(3, entryA.getPoints() + entryB.getPoints()); // toplam = 3
     }
 
     @Test
@@ -51,7 +62,6 @@ class LeagueTest {
         league.addTeam(teamA);
         league.addTeam(teamB);
 
-        // Manuel draw olustur
         FootballMatch match = new FootballMatch(teamA, teamB) {
             @Override
             public void simulate() {
