@@ -1,18 +1,19 @@
 package com.sportsmanager.basketball;
+import com.sportsmanager.domain.Player;
 
-public class BasketballPlayer {
+public class BasketballPlayer extends Player {
      public enum Position {
-        GOALKEEPER, DEFENDER, MIDFIELDER, FORWARD
+        POINT_GUARD, SHOOTING_GUARD, SMALL_FORWARD, POWER_FORWARD, CENTER
     }
 
     private Position position;
 
-    public FootballPlayer(String name, int age, int skillLevel, Position position) {
+    public BasketballPlayer(String name, int age, int skillLevel, Position position) {
         super(name, age, skillLevel);
         this.position = position;
     }
 
-    public Position getFootballPosition() {
+    public Position getBasketballPosition() {
         return position;
     }
 

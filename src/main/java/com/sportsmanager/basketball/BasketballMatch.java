@@ -2,46 +2,49 @@ package com.sportsmanager.basketball;
 
 import java.util.Random;
 
+import com.sportsmanager.domain.Match;
 import com.sportsmanager.domain.Team;
 
-public class BasketballMatch {
+public class BasketballMatch extends Match {
 
-    
     private static final Random random = new Random();
 
-    public FootballMatch(Team homeTeam, Team awayTeam) {
+    public BasketballMatch(Team homeTeam, Team awayTeam) {
         super(homeTeam, awayTeam);
     }
 
     @Override
     public void simulate() {
-        if (played) return;
+        if (played)
+            return;
 
         double homeSkill = homeTeam.getAverageSkill();
         double awaySkill = awayTeam.getAverageSkill();
 
         // Home advantage bonus
         homeSkill *= 1.1;
-
         double total = homeSkill + awaySkill;
         double homeWinChance = homeSkill / total;
 
-        double roll = random.nextDouble();
+        int homeBase = 70 + random.nextInt(40);
+        int awayBase = 70 + random.nextInt(40);
 
-        if (roll < homeWinChance * 0.6) {
-            // Home win
-            homeScore = 1 + random.nextInt(4);
-            awayScore = random.nextInt(homeScore);
-        } else if (roll < homeWinChance * 0.6 + 0.25) {
-            // Draw
-            homeScore = random.nextInt(3);
-            awayScore = homeScore;
+        double roll = random.nextDouble();
+        if (roll < homeWinChance) {
+            homeScore = homeBase + 5 + random.nextInt(10);
+            awayScore = awayBase - random.nextInt(10);
         } else {
-            // Away win
-            awayScore = 1 + random.nextInt(4);
-            homeScore = random.nextInt(awayScore);
+            awayScore = awayBase + 5 + random.nextInt(10);
+            homeScore = homeBase - random.nextInt(10);
         }
 
+        homeScore = Math.max(homeScore, 60);
+        awayScore = Math.max(awayScore, 60);
+
+        // Beraberlik yok
+        if (homeScore == awayScore) {
+            homeScore += 2;
+        }
         played = true;
 
         // Injury chance: %10 per match
