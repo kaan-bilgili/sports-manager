@@ -8,7 +8,7 @@ import com.sportsmanager.domain.Team;
 import com.sportsmanager.sport.Sport;
 
 public class BasketballSport implements Sport {
-
+    private static final long serialVersionUID = 1L;
     private static final String[] POSITIONS = { "POINT_GUARD", "SHOOTING_GUARD",
             "SMALL_FORWARD", "POWER_FORWARD", "CENTER" };
     private static final Random random = new Random();

@@ -8,7 +8,7 @@ import com.sportsmanager.sport.Sport;
 import java.util.Random;
 
 public class FootballSport implements Sport {
-
+    private static final long serialVersionUID = 1L;
     private static final String[] POSITIONS = {"GOALKEEPER", "DEFENDER",
             "MIDFIELDER", "FORWARD"};
     private static final Random random = new Random();
