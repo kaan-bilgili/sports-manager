@@ -1,13 +1,12 @@
 package com.sportsmanager.engine;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.sportsmanager.domain.Fixture;
 import com.sportsmanager.domain.Match;
 import com.sportsmanager.domain.Team;
 import com.sportsmanager.sport.Sport;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 public class FixtureGenerator {
 
@@ -36,14 +35,12 @@ public class FixtureGenerator {
                 int home = (actualRound + i) % (n - 1);
                 int away = (n - 1 - i + actualRound) % (n - 1);
 
-                if (i == 0)
-                    away = n - 1;
+                if (i == 0) away = n - 1;
 
                 Team homeTeam = teamList.get(home);
                 Team awayTeam = teamList.get(away);
 
-                if (homeTeam == null || awayTeam == null)
-                    continue;
+                if (homeTeam == null || awayTeam == null) continue;
 
                 if (round >= halfRounds) {
                     Match match = sport.createMatch(awayTeam, homeTeam);
