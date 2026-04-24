@@ -1,7 +1,11 @@
 package com.sportsmanager.domain;
 
-public abstract class Player {
+import java.io.Serializable;
 
+public abstract class Player implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    // geri kalan kod aynı kalır
     protected String name;
     protected int age;
     protected int skillLevel;

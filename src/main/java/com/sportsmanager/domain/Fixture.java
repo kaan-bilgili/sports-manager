@@ -1,11 +1,13 @@
 package com.sportsmanager.domain;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Fixture {
+public class Fixture implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private Map<Integer, List<Match>> rounds;
     private int totalRounds;
