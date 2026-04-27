@@ -13,6 +13,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 public class SportSelectionScreen {
@@ -25,39 +27,63 @@ public class SportSelectionScreen {
     }
 
     private void buildUI() {
-        view = new VBox(30);
-        view.setAlignment(Pos.CENTER);
-        view.setPadding(new Insets(50));
+        view = new VBox();
         view.setStyle("-fx-background-color: #1a1a2e;");
 
-        Label title = new Label("Select Sport");
-        title.setStyle("-fx-font-size: 32px; -fx-font-weight: bold; "
-                + "-fx-text-fill: #e94560;");
+        // --- ÜST BAŞLIK BANDI ---
+        HBox topBar = new HBox();
+        topBar.setPadding(new Insets(24, 40, 24, 40));
+        topBar.setAlignment(Pos.CENTER_LEFT);
+        topBar.setStyle("-fx-background-color: #0f0f1a; -fx-border-color: #2a2a4a; "
+                + "-fx-border-width: 0 0 1 0;");
 
-        Label subtitle = new Label("Choose the sport you want to manage");
-        subtitle.setStyle("-fx-font-size: 14px; -fx-text-fill: #a0a0b0;");
+        Label backArrow = new Label("← Back");
+        backArrow.setStyle("-fx-font-size: 13px; -fx-text-fill: #a0a0b0; "
+                + "-fx-cursor: hand;");
+        backArrow.setOnMouseClicked(e -> MainApp.showMainMenu());
 
+        Region topSpacer = new Region();
+        HBox.setHgrow(topSpacer, Priority.ALWAYS);
+
+        Label stepLabel = new Label("Step 1 of 2");
+        stepLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #404060;");
+
+        topBar.getChildren().addAll(backArrow, topSpacer, stepLabel);
+
+        // --- ORTA İÇERİK ---
+        VBox content = new VBox(32);
+        content.setAlignment(Pos.CENTER);
+        content.setPadding(new Insets(60, 80, 40, 80));
+        VBox.setVgrow(content, Priority.ALWAYS);
+
+        Label title = new Label("Choose Your Sport");
+        title.setStyle("-fx-font-size: 30px; -fx-font-weight: bold; "
+                + "-fx-text-fill: white; -fx-font-family: 'Segoe UI';");
+
+        Label subtitle = new Label("Select the sport you want to manage");
+        subtitle.setStyle("-fx-font-size: 13px; -fx-text-fill: #606080;");
+
+        // Sport kartları
         ToggleGroup group = new ToggleGroup();
 
-        ToggleButton footballBtn = createToggleButton("Football", group);
-        ToggleButton basketballBtn = createToggleButton("Basketball", group);
+        ToggleButton footballBtn = createSportCard("⚽", "Football",
+                "Premier League, La Liga, Serie A...", group);
+        ToggleButton basketballBtn = createSportCard("🏀", "Basketball",
+                "NBA, EuroLeague, FIBA...", group);
 
-        HBox sportButtons = new HBox(20, footballBtn, basketballBtn);
-        sportButtons.setAlignment(Pos.CENTER);
+        HBox sportCards = new HBox(24, footballBtn, basketballBtn);
+        sportCards.setAlignment(Pos.CENTER);
 
-        Button startBtn = createButton("Start Game", "#e94560");
-        Button backBtn = createButton("Back", "#16213e");
-
+        // Alt butonlar
+        Button startBtn = createPrimaryButton("Start Game →");
         startBtn.setOnAction(e -> {
             ToggleButton selected = (ToggleButton) group.getSelectedToggle();
             if (selected == null)
                 return;
 
-            if (selected == footballBtn) {
-                selectedSport = new FootballSport();
-            } else {
-                selectedSport = new BasketballSport();
-            }
+            selectedSport = (selected == footballBtn)
+                    ? new FootballSport()
+                    : new BasketballSport();
 
             GameFacade facade = new GameFacade(selectedSport);
             facade.initGame(8);
@@ -68,37 +94,81 @@ public class SportSelectionScreen {
             MainApp.primaryStage.setScene(scene);
         });
 
-        backBtn.setOnAction(e -> MainApp.showMainMenu());
+        content.getChildren().addAll(title, subtitle, sportCards, startBtn);
 
-        view.getChildren().addAll(title, subtitle, sportButtons,
-                new VBox(10, startBtn, backBtn));
-        ((VBox) view.getChildren().get(3)).setAlignment(Pos.CENTER);
+        view.getChildren().addAll(topBar, content);
     }
 
-    private ToggleButton createToggleButton(String text, ToggleGroup group) {
-        ToggleButton btn = new ToggleButton(text);
+    private ToggleButton createSportCard(String icon, String name,
+            String desc, ToggleGroup group) {
+        VBox card = new VBox(10);
+        card.setAlignment(Pos.CENTER);
+        card.setPadding(new Insets(30, 20, 30, 20));
+
+        Label iconLabel = new Label(icon);
+        iconLabel.setStyle("-fx-font-size: 40px;");
+
+        Label nameLabel = new Label(name);
+        nameLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; "
+                + "-fx-text-fill: white; -fx-font-family: 'Segoe UI';");
+
+        Label descLabel = new Label(desc);
+        descLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #606080; "
+                + "-fx-text-alignment: center;");
+        descLabel.setWrapText(true);
+        descLabel.setMaxWidth(160);
+
+        card.getChildren().addAll(iconLabel, nameLabel, descLabel);
+
+        ToggleButton btn = new ToggleButton();
+        btn.setGraphic(card);
         btn.setToggleGroup(group);
-        btn.setPrefWidth(180);
-        btn.setPrefHeight(80);
-        btn.setStyle("-fx-background-color: #16213e; "
-                + "-fx-text-fill: white; "
-                + "-fx-font-size: 16px; "
-                + "-fx-border-color: #e94560; "
-                + "-fx-border-width: 1px; "
-                + "-fx-cursor: hand;");
+        btn.setPrefWidth(200);
+        btn.setPrefHeight(180);
+        btn.setStyle(
+                "-fx-background-color: #16213e; "
+                        + "-fx-border-color: #2a2a4a; "
+                        + "-fx-border-width: 2px; "
+                        + "-fx-border-radius: 8px; "
+                        + "-fx-background-radius: 8px; "
+                        + "-fx-cursor: hand;");
+
+        // Seçili görünümü
+        btn.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
+            if (isSelected) {
+                btn.setStyle(
+                        "-fx-background-color: #1e2d50; "
+                                + "-fx-border-color: #e94560; "
+                                + "-fx-border-width: 2px; "
+                                + "-fx-border-radius: 8px; "
+                                + "-fx-background-radius: 8px; "
+                                + "-fx-cursor: hand;");
+            } else {
+                btn.setStyle(
+                        "-fx-background-color: #16213e; "
+                                + "-fx-border-color: #2a2a4a; "
+                                + "-fx-border-width: 2px; "
+                                + "-fx-border-radius: 8px; "
+                                + "-fx-background-radius: 8px; "
+                                + "-fx-cursor: hand;");
+            }
+        });
+
         return btn;
     }
 
-    private Button createButton(String text, String color) {
+    private Button createPrimaryButton(String text) {
         Button btn = new Button(text);
-        btn.setPrefWidth(250);
-        btn.setPrefHeight(45);
-        btn.setStyle("-fx-background-color: " + color + "; "
-                + "-fx-text-fill: white; "
-                + "-fx-font-size: 14px; "
-                + "-fx-border-color: #e94560; "
-                + "-fx-border-width: 1px; "
-                + "-fx-cursor: hand;");
+        btn.setPrefWidth(280);
+        btn.setPrefHeight(50);
+        btn.setStyle(
+                "-fx-background-color: #e94560; "
+                        + "-fx-text-fill: white; "
+                        + "-fx-font-size: 14px; "
+                        + "-fx-font-weight: bold; "
+                        + "-fx-font-family: 'Segoe UI'; "
+                        + "-fx-background-radius: 4px; "
+                        + "-fx-cursor: hand;");
         return btn;
     }
 
