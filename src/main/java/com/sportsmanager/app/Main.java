@@ -1,5 +1,6 @@
 package com.sportsmanager.app;
 
+<<<<<<< Updated upstream
 import com.sportsmanager.engine.GameEngine;
 
 public class Main {
@@ -8,5 +9,10 @@ public class Main {
 
         GameEngine engine = new GameEngine();
         engine.startDemo();
+=======
+public class Main {
+    public static void main(String[] args) {
+        MainApp.main(args);
+>>>>>>> Stashed changes
     }
 }
