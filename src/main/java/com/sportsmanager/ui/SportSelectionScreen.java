@@ -18,7 +18,6 @@ import javafx.scene.layout.VBox;
 public class SportSelectionScreen {
 
     private VBox view;
-    private Sport selectedSport = null;
 
     public SportSelectionScreen() {
         buildUI();
@@ -29,6 +28,8 @@ public class SportSelectionScreen {
         view.setAlignment(Pos.CENTER);
         view.setPadding(new Insets(50));
         view.setStyle("-fx-background-color: #1a1a2e;");
+        view.setPrefHeight(650);
+        view.setPrefWidth(900);
 
         Label title = new Label("Select Sport");
         title.setStyle("-fx-font-size: 32px; -fx-font-weight: bold; "
@@ -53,6 +54,7 @@ public class SportSelectionScreen {
             if (selected == null)
                 return;
 
+            Sport selectedSport;
             if (selected == footballBtn) {
                 selectedSport = new FootballSport();
             } else {
@@ -66,13 +68,15 @@ public class SportSelectionScreen {
             javafx.scene.Scene scene = new javafx.scene.Scene(
                     dashboard.getView(), 900, 650);
             MainApp.primaryStage.setScene(scene);
+            MainApp.primaryStage.sizeToScene();
         });
 
         backBtn.setOnAction(e -> MainApp.showMainMenu());
 
-        view.getChildren().addAll(title, subtitle, sportButtons,
-                new VBox(10, startBtn, backBtn));
-        ((VBox) view.getChildren().get(3)).setAlignment(Pos.CENTER);
+        VBox buttons = new VBox(10, startBtn, backBtn);
+        buttons.setAlignment(Pos.CENTER);
+
+        view.getChildren().addAll(title, subtitle, sportButtons, buttons);
     }
 
     private ToggleButton createToggleButton(String text, ToggleGroup group) {

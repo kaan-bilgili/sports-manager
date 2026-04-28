@@ -24,6 +24,8 @@ public class MainMenuScreen {
         view.setAlignment(Pos.CENTER);
         view.setPadding(new Insets(50));
         view.setStyle("-fx-background-color: #1a1a2e;");
+        view.setPrefHeight(650);
+        view.setPrefWidth(900);
 
         Label title = new Label("Sports Manager");
         title.setStyle("-fx-font-size: 42px; -fx-font-weight: bold; "
@@ -36,12 +38,7 @@ public class MainMenuScreen {
         Button loadGameBtn = createButton("Load Game", "#16213e");
         Button exitBtn = createButton("Exit", "#16213e");
 
-        newGameBtn.setOnAction(e -> {
-            SportSelectionScreen sportSelection = new SportSelectionScreen();
-            javafx.scene.Scene scene = new javafx.scene.Scene(
-                    sportSelection.getView(), 900, 650);
-            MainApp.primaryStage.setScene(scene);
-        });
+        newGameBtn.setOnAction(e -> MainApp.showSportSelection());
 
         loadGameBtn.setOnAction(e -> {
             GameSaveManager saveManager = new GameSaveManager();
@@ -58,6 +55,7 @@ public class MainMenuScreen {
                     javafx.scene.Scene scene = new javafx.scene.Scene(
                             dashboard.getView(), 900, 650);
                     MainApp.primaryStage.setScene(scene);
+                    MainApp.primaryStage.sizeToScene();
                 } catch (Exception ex) {
                     Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setTitle("Load Error");
@@ -70,9 +68,10 @@ public class MainMenuScreen {
 
         exitBtn.setOnAction(e -> System.exit(0));
 
-        view.getChildren().addAll(title, subtitle,
-                new VBox(10, newGameBtn, loadGameBtn, exitBtn));
-        ((VBox) view.getChildren().get(2)).setAlignment(Pos.CENTER);
+        VBox buttons = new VBox(10, newGameBtn, loadGameBtn, exitBtn);
+        buttons.setAlignment(Pos.CENTER);
+
+        view.getChildren().addAll(title, subtitle, buttons);
     }
 
     private Button createButton(String text, String color) {
