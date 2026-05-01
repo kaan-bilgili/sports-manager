@@ -4,12 +4,16 @@ import com.sportsmanager.app.MainApp;
 import com.sportsmanager.domain.StandingEntry;
 import com.sportsmanager.engine.GameFacade;
 import com.sportsmanager.engine.GameSaveManager;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 
 public class LeagueDashboardScreen {
 
@@ -23,197 +27,151 @@ public class LeagueDashboardScreen {
 
     private void buildUI() {
         view = new BorderPane();
+        view.setPrefSize(900, 650);
         view.setStyle("-fx-background-color: #1a1a2e;");
-        view.setPrefHeight(650);
-        view.setPrefWidth(900);
-
-        view.setLeft(buildSidebar());
-        view.setCenter(buildStandingsTable());
         view.setTop(buildHeader());
+        view.setLeft(buildSidebar());
+        view.setCenter(buildStandings());
     }
 
-    private VBox buildHeader() {
-        VBox header = new VBox(5);
-        header.setPadding(new Insets(20, 20, 10, 20));
-        header.setStyle("-fx-background-color: #16213e;");
-
-        Label title = new Label(facade.getLeague().getName());
-        title.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; "
-                + "-fx-text-fill: #e94560;");
-
-        Label season = new Label("Season " + facade.getSeason().getSeasonNumber()
-                + "  |  Week " + facade.getSeason().getCurrentWeek());
-        season.setStyle("-fx-font-size: 13px; -fx-text-fill: #a0a0b0;");
-
-        header.getChildren().addAll(title, season);
-        return header;
+    private Label buildHeader() {
+        Label lbl = new Label(facade.getLeague().getName()
+                + " | Week " + facade.getSeason().getCurrentWeek());
+        lbl.setMaxWidth(Double.MAX_VALUE);
+        lbl.setStyle("-fx-background-color: #16213e; -fx-text-fill: white; "
+                + "-fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 12px;");
+        return lbl;
     }
 
     private VBox buildSidebar() {
-        VBox sidebar = new VBox(10);
-        sidebar.setPrefWidth(180);
-        sidebar.setPadding(new Insets(20));
-        sidebar.setStyle("-fx-background-color: #16213e;");
+        VBox box = new VBox(8);
+        box.setPrefWidth(155);
+        box.setStyle("-fx-background-color: #16213e; -fx-padding: 12px;");
 
-        Button standingsBtn = createSidebarButton("Standings");
-        Button fixtureBtn = createSidebarButton("Fixture");
-        Button nextMatchBtn = createSidebarButton("Next Match");
-        Button saveBtn = createSidebarButton("Save Game");
-        Button menuBtn = createSidebarButton("Main Menu");
+        Button s = btn("Standings");
+        Button f = btn("Fixture");
+        Button t = btn("Team");
+        Button n = btn("Next Match");
+        Button sv = btn("Save Game");
+        Button m = btn("Main Menu");
 
-        standingsBtn.setOnAction(e -> view.setCenter(buildStandingsTable()));
-        fixtureBtn.setOnAction(e -> view.setCenter(buildFixturePanel()));
+        s.setOnAction(e -> view.setCenter(buildStandings()));
+        f.setOnAction(e -> view.setCenter(buildFixture()));
 
-        nextMatchBtn.setOnAction(e -> {
+        t.setOnAction(e -> {
+            TeamManagementScreen team = new TeamManagementScreen(facade);
+            javafx.scene.Scene scene = new javafx.scene.Scene(
+                    team.getView(), 900, 650);
+            MainApp.primaryStage.setScene(scene);
+            MainApp.primaryStage.sizeToScene();
+        });
+
+        n.setOnAction(e -> {
             if (!facade.isSeasonFinished()) {
                 facade.advanceWeek();
-                view.setCenter(buildStandingsTable());
                 view.setTop(buildHeader());
+                view.setCenter(buildStandings());
             } else {
-                showSeasonWinner();
+                new Alert(Alert.AlertType.INFORMATION,
+                        "Champion: " + facade.getLeader().getName()).show();
             }
         });
 
-        saveBtn.setOnAction(e -> {
+        sv.setOnAction(e -> {
             try {
                 new GameSaveManager().save(facade);
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Save Game");
-                alert.setHeaderText("Game Saved");
-                alert.setContentText("Your game has been saved successfully.");
-                alert.showAndWait();
+                new Alert(Alert.AlertType.INFORMATION, "Saved!").show();
             } catch (Exception ex) {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Save Error");
-                alert.setHeaderText("Could not save game");
-                alert.setContentText(ex.getMessage());
-                alert.showAndWait();
+                new Alert(Alert.AlertType.ERROR, ex.getMessage()).show();
             }
         });
 
-        menuBtn.setOnAction(e -> MainApp.showMainMenu());
+        m.setOnAction(e -> MainApp.showMainMenu());
 
-        sidebar.getChildren().addAll(
-                standingsBtn, fixtureBtn, nextMatchBtn, saveBtn, menuBtn);
-        return sidebar;
+        box.getChildren().addAll(s, f, t, n, sv, m);
+        return box;
     }
 
-    private VBox buildStandingsTable() {
-        VBox container = new VBox(15);
-        container.setPadding(new Insets(20));
-
-        Label title = new Label("League Standings");
-        title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; "
-                + "-fx-text-fill: white;");
-
-        TableView<StandingEntry> table = new TableView<>();
-        table.setStyle("-fx-background-color: #16213e; -fx-text-fill: white;");
-        table.setPrefHeight(500);
+    private TableView<StandingEntry> buildStandings() {
+        TableView<StandingEntry> t = new TableView<>();
+        t.setStyle("-fx-background-color: #1a1a2e;");
 
         TableColumn<StandingEntry, String> teamCol = new TableColumn<>("Team");
-        teamCol.setCellValueFactory(data ->
-                new SimpleStringProperty(data.getValue().getTeam().getName()));
-        teamCol.setPrefWidth(150);
+        teamCol.setCellValueFactory(d ->
+                new SimpleStringProperty(d.getValue().getTeam().getName()));
+        teamCol.setPrefWidth(160);
 
         TableColumn<StandingEntry, Integer> pCol = new TableColumn<>("P");
-        pCol.setCellValueFactory(data ->
+        pCol.setCellValueFactory(d ->
                 new SimpleIntegerProperty(
-                        data.getValue().getMatchesPlayed()).asObject());
-        pCol.setPrefWidth(50);
+                        d.getValue().getMatchesPlayed()).asObject());
+        pCol.setPrefWidth(45);
 
         TableColumn<StandingEntry, Integer> wCol = new TableColumn<>("W");
-        wCol.setCellValueFactory(data ->
+        wCol.setCellValueFactory(d ->
                 new SimpleIntegerProperty(
-                        data.getValue().getWins()).asObject());
-        wCol.setPrefWidth(50);
+                        d.getValue().getWins()).asObject());
+        wCol.setPrefWidth(45);
 
         TableColumn<StandingEntry, Integer> dCol = new TableColumn<>("D");
-        dCol.setCellValueFactory(data ->
+        dCol.setCellValueFactory(d ->
                 new SimpleIntegerProperty(
-                        data.getValue().getDraws()).asObject());
-        dCol.setPrefWidth(50);
+                        d.getValue().getDraws()).asObject());
+        dCol.setPrefWidth(45);
 
         TableColumn<StandingEntry, Integer> lCol = new TableColumn<>("L");
-        lCol.setCellValueFactory(data ->
+        lCol.setCellValueFactory(d ->
                 new SimpleIntegerProperty(
-                        data.getValue().getLosses()).asObject());
-        lCol.setPrefWidth(50);
+                        d.getValue().getLosses()).asObject());
+        lCol.setPrefWidth(45);
 
         TableColumn<StandingEntry, Integer> gdCol = new TableColumn<>("GD");
-        gdCol.setCellValueFactory(data ->
+        gdCol.setCellValueFactory(d ->
                 new SimpleIntegerProperty(
-                        data.getValue().getGoalDifference()).asObject());
-        gdCol.setPrefWidth(60);
+                        d.getValue().getGoalDifference()).asObject());
+        gdCol.setPrefWidth(50);
 
         TableColumn<StandingEntry, Integer> ptsCol = new TableColumn<>("Pts");
-        ptsCol.setCellValueFactory(data ->
+        ptsCol.setCellValueFactory(d ->
                 new SimpleIntegerProperty(
-                        data.getValue().getPoints()).asObject());
-        ptsCol.setPrefWidth(60);
+                        d.getValue().getPoints()).asObject());
+        ptsCol.setPrefWidth(50);
 
-        table.getColumns().addAll(teamCol, pCol, wCol, dCol, lCol, gdCol, ptsCol);
-        table.getItems().addAll(facade.getLeague().getSortedStandings());
-
-        container.getChildren().addAll(title, table);
-        return container;
+        t.getColumns().addAll(teamCol, pCol, wCol, dCol, lCol, gdCol, ptsCol);
+        t.getItems().addAll(facade.getLeague().getSortedStandings());
+        return t;
     }
 
-    private VBox buildFixturePanel() {
-        VBox container = new VBox(15);
-        container.setPadding(new Insets(20));
-
-        Label title = new Label("Fixture");
-        title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; "
-                + "-fx-text-fill: white;");
-
-        ScrollPane scrollPane = new ScrollPane();
-        scrollPane.setStyle("-fx-background-color: #1a1a2e;");
-        scrollPane.setPrefHeight(500);
-
-        VBox fixtureList = new VBox(10);
-        fixtureList.setPadding(new Insets(10));
+    private ScrollPane buildFixture() {
+        VBox list = new VBox(6);
+        list.setStyle("-fx-padding: 10px; -fx-background-color: #1a1a2e;");
 
         facade.getLeague().getFixture().getAllRounds().entrySet()
                 .stream()
                 .sorted(java.util.Map.Entry.comparingByKey())
                 .forEach(entry -> {
-                    Label weekLabel = new Label("Week " + entry.getKey());
-                    weekLabel.setStyle("-fx-font-size: 14px; "
-                            + "-fx-font-weight: bold; -fx-text-fill: #e94560;");
-                    fixtureList.getChildren().add(weekLabel);
-
+                    Label w = new Label("Week " + entry.getKey());
+                    w.setStyle("-fx-text-fill: #e94560; -fx-font-weight: bold;");
+                    list.getChildren().add(w);
                     entry.getValue().forEach(match -> {
-                        Label matchLabel = new Label("  " + match.toString());
-                        matchLabel.setStyle("-fx-text-fill: white; "
-                                + "-fx-font-size: 13px;");
-                        fixtureList.getChildren().add(matchLabel);
+                        Label ml = new Label("  " + match);
+                        ml.setStyle("-fx-text-fill: white;");
+                        list.getChildren().add(ml);
                     });
                 });
 
-        scrollPane.setContent(fixtureList);
-        container.getChildren().addAll(title, scrollPane);
-        return container;
+        ScrollPane sp = new ScrollPane(list);
+        sp.setStyle("-fx-background-color: #1a1a2e;");
+        return sp;
     }
 
-    private void showSeasonWinner() {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Season Finished");
-        alert.setHeaderText("Season Complete!");
-        alert.setContentText("Champion: " + facade.getLeader().getName());
-        alert.showAndWait();
-    }
-
-    private Button createSidebarButton(String text) {
-        Button btn = new Button(text);
-        btn.setPrefWidth(160);
-        btn.setPrefHeight(40);
-        btn.setStyle("-fx-background-color: #1a1a2e; "
-                + "-fx-text-fill: white; "
-                + "-fx-font-size: 13px; "
-                + "-fx-border-color: #e94560; "
-                + "-fx-border-width: 1px; "
+    private Button btn(String text) {
+        Button b = new Button(text);
+        b.setPrefSize(140, 36);
+        b.setStyle("-fx-background-color: #1a1a2e; -fx-text-fill: white; "
+                + "-fx-border-color: #e94560; -fx-border-width: 1px; "
                 + "-fx-cursor: hand;");
-        return btn;
+        return b;
     }
 
     public BorderPane getView() {
