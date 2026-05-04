@@ -1,12 +1,14 @@
 package com.sportsmanager.domain;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class League {
+public class League implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private String name;
     private List<Team> teams;
@@ -51,14 +53,13 @@ public class League {
             homeEntry.recordLoss(homeScore, awayScore);
         }
     }
+
     public List<StandingEntry> getSortedStandings() {
         List<StandingEntry> list = new ArrayList<>(standings.values());
-
         list.sort(Comparator
-            .comparingInt(StandingEntry::getPoints).reversed()
-            .thenComparingInt(StandingEntry::getGoalDifference).reversed()
-            .thenComparingInt(StandingEntry::getGoalsFor).reversed());
-
+                .comparingInt(StandingEntry::getPoints).reversed()
+                .thenComparingInt(StandingEntry::getGoalDifference).reversed()
+                .thenComparingInt(StandingEntry::getGoalsFor).reversed());
         return list;
     }
 

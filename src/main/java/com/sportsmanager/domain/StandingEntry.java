@@ -1,6 +1,9 @@
 package com.sportsmanager.domain;
 
-public class StandingEntry {
+import java.io.Serializable;
+
+public class StandingEntry implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private Team team;
     private int wins;

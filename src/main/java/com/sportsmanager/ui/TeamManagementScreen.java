@@ -1,5 +1,6 @@
 package com.sportsmanager.ui;
 
+import com.sportsmanager.app.MainApp;
 import com.sportsmanager.domain.Player;
 import com.sportsmanager.domain.Team;
 import com.sportsmanager.engine.GameFacade;
@@ -66,6 +67,21 @@ public class TeamManagementScreen {
             });
             box.getChildren().add(btn);
         }
+
+        Button backBtn = new Button("Back");
+        backBtn.setPrefSize(155, 34);
+        backBtn.setStyle("-fx-background-color: #e94560; -fx-text-fill: white; "
+                + "-fx-border-color: #e94560; -fx-border-width: 1px; "
+                + "-fx-cursor: hand; -fx-font-size: 12px;");
+        backBtn.setOnAction(e -> {
+            LeagueDashboardScreen dashboard = new LeagueDashboardScreen(facade);
+            javafx.scene.Scene scene = new javafx.scene.Scene(
+                    dashboard.getView(), 900, 650);
+            MainApp.primaryStage.setScene(scene);
+            MainApp.primaryStage.sizeToScene();
+        });
+
+        box.getChildren().add(backBtn);
         return box;
     }
 
@@ -101,7 +117,8 @@ public class TeamManagementScreen {
 
         TableColumn<Player, Integer> skillCol = new TableColumn<>("Skill");
         skillCol.setCellValueFactory(d ->
-                new SimpleIntegerProperty(d.getValue().getSkillLevel()).asObject());
+                new SimpleIntegerProperty(
+                        d.getValue().getSkillLevel()).asObject());
         skillCol.setPrefWidth(80);
 
         TableColumn<Player, String> statusCol = new TableColumn<>("Status");

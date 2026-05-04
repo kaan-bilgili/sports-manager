@@ -7,15 +7,17 @@ import com.sportsmanager.domain.StandingEntry;
 import com.sportsmanager.domain.Team;
 import com.sportsmanager.sport.Sport;
 
-import java.util.List;
+import java.io.Serializable;
 import java.util.Random;
 
-public class GameFacade {
+public class GameFacade implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private Sport sport;
     private League league;
     private Season season;
-    private final Random random = new Random();
+    private transient Random random = new Random();
 
     private static final String[] TEAM_NAMES = {
         "Galatasaray", "Fenerbahce", "Besiktas", "Trabzonspor",
@@ -52,6 +54,7 @@ public class GameFacade {
     }
 
     private void generatePlayers(Team team) {
+        if (random == null) random = new Random();
         int squadSize = sport.getSquadSize() + sport.getSubstituteCount();
         for (int i = 0; i < squadSize; i++) {
             String name = PLAYER_NAMES[random.nextInt(PLAYER_NAMES.length)]

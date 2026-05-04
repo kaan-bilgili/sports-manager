@@ -52,13 +52,6 @@ public class LeagueDashboardScreen {
         Button f = btn("Fixture");
         Button t = btn("Team");
         Button n = btn("Next Match");
-        Button t = btn("Team");
-t.setOnAction(e -> {
-    TeamManagementScreen team = new TeamManagementScreen(facade);
-    javafx.scene.Scene scene = new javafx.scene.Scene(team.getView(), 900, 650);
-    MainApp.primaryStage.setScene(scene);
-    MainApp.primaryStage.sizeToScene();
-});
         Button sv = btn("Save Game");
         Button m = btn("Main Menu");
 
@@ -75,9 +68,11 @@ t.setOnAction(e -> {
 
         n.setOnAction(e -> {
             if (!facade.isSeasonFinished()) {
-                facade.advanceWeek();
-                view.setTop(buildHeader());
-                view.setCenter(buildStandings());
+                MatchSimulationScreen sim = new MatchSimulationScreen(facade);
+                javafx.scene.Scene scene = new javafx.scene.Scene(
+                        sim.getView(), 900, 650);
+                MainApp.primaryStage.setScene(scene);
+                MainApp.primaryStage.sizeToScene();
             } else {
                 new Alert(Alert.AlertType.INFORMATION,
                         "Champion: " + facade.getLeader().getName()).show();
