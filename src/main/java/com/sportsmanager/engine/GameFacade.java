@@ -19,10 +19,12 @@ public class GameFacade implements Serializable {
     private Season season;
     private transient Random random = new Random();
 
-    private static final String[] TEAM_NAMES = {
-        "Galatasaray", "Fenerbahce", "Besiktas", "Trabzonspor",
-        "Basaksehir", "Sivasspor", "Alanyaspor", "Antalyaspor"
-    };
+   private static final String[] TEAM_NAMES = {
+    "Galatasaray", "Fenerbahce", "Besiktas", "Trabzonspor",
+    "Basaksehir", "Sivasspor", "Alanyaspor", "Antalyaspor",
+    "Lakers", "Celtics", "Bulls", "Warriors",
+    "Knicks", "Heat", "Spurs", "Nets"
+};
 
     private static final String[] PLAYER_NAMES = {
         "Ali", "Veli", "Mehmet", "Ahmet", "Mustafa",

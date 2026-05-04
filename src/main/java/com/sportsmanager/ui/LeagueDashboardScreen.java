@@ -1,6 +1,5 @@
 package com.sportsmanager.ui;
 
-import com.sportsmanager.ui.MatchSimulationScreen;
 import com.sportsmanager.app.MainApp;
 import com.sportsmanager.domain.StandingEntry;
 import com.sportsmanager.engine.GameFacade;
@@ -67,18 +66,18 @@ public class LeagueDashboardScreen {
             MainApp.primaryStage.sizeToScene();
         });
 
-       n.setOnAction(e -> {
-    if (!facade.isSeasonFinished()) {
-        MatchSimulationScreen sim = new MatchSimulationScreen(facade);
-        javafx.scene.Scene scene = new javafx.scene.Scene(
-                sim.getView(), 900, 650);
-        MainApp.primaryStage.setScene(scene);
-        MainApp.primaryStage.sizeToScene();
-    } else {
-        new Alert(Alert.AlertType.INFORMATION,
-                "Champion: " + facade.getLeader().getName()).show();
-    }
-});
+        n.setOnAction(e -> {
+            if (!facade.isSeasonFinished()) {
+                MatchSimulationScreen sim = new MatchSimulationScreen(facade);
+                javafx.scene.Scene scene = new javafx.scene.Scene(
+                        sim.getView(), 900, 650);
+                MainApp.primaryStage.setScene(scene);
+                MainApp.primaryStage.sizeToScene();
+            } else {
+                new Alert(Alert.AlertType.INFORMATION,
+                        "Champion: " + facade.getLeader().getName()).show();
+            }
+        });
 
         sv.setOnAction(e -> {
             try {
