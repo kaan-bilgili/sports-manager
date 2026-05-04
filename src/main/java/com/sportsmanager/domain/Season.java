@@ -19,7 +19,8 @@ public class Season implements Serializable {
     }
 
     public void advanceWeek() {
-        if (finished) return;
+        if (finished)
+            return;
 
         List<Match> matches = league.getFixture().getMatchesForRound(currentWeek);
         for (Match match : matches) {
@@ -34,14 +35,36 @@ public class Season implements Serializable {
         }
     }
 
-    public boolean isFinished() { return finished; }
-    public int getCurrentWeek() { return currentWeek; }
-    public int getSeasonNumber() { return seasonNumber; }
-    public League getLeague() { return league; }
+    public void nextWeek() {
+        if (finished)
+            return;
+        if (currentWeek >= league.getFixture().getTotalRounds()) {
+            finished = true;
+        } else {
+            currentWeek++;
+        }
+    }
+
+    public boolean isFinished() {
+        return finished;
+    }
+
+    public int getCurrentWeek() {
+        return currentWeek;
+    }
+
+    public int getSeasonNumber() {
+        return seasonNumber;
+    }
+
+    public League getLeague() {
+        return league;
+    }
 
     public Team getLeader() {
         List<StandingEntry> standings = league.getSortedStandings();
-        if (standings.isEmpty()) return null;
+        if (standings.isEmpty())
+            return null;
         return standings.get(0).getTeam();
     }
 }

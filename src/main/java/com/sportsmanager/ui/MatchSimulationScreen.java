@@ -1,9 +1,13 @@
 package com.sportsmanager.ui;
 
+import java.util.List;
+import java.util.Random;
+
 import com.sportsmanager.app.MainApp;
 import com.sportsmanager.domain.Match;
 import com.sportsmanager.domain.Team;
 import com.sportsmanager.engine.GameFacade;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -12,9 +16,6 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-
-import java.util.List;
-import java.util.Random;
 
 public class MatchSimulationScreen {
 
@@ -50,7 +51,6 @@ public class MatchSimulationScreen {
         content.setPadding(new Insets(20));
         content.setAlignment(Pos.TOP_CENTER);
 
-        // Get next unplayed match
         Match nextMatch = getNextMatch();
 
         if (nextMatch == null) {
@@ -60,9 +60,19 @@ public class MatchSimulationScreen {
             return content;
         }
 
-        // Simulate the match
+        // Simulate
         nextMatch.simulate();
         facade.getLeague().updateStandings(nextMatch);
+
+        // Check if week is complete
+        boolean weekComplete = facade.getLeague()
+                .getFixture()
+                .getMatchesForRound(facade.getSeason().getCurrentWeek())
+                .stream().allMatch(Match::isPlayed);
+
+        if (weekComplete) {
+            facade.getSeason().nextWeek();
+        }
 
         // Score display
         HBox scoreBox = new HBox(20);
@@ -85,7 +95,7 @@ public class MatchSimulationScreen {
 
         scoreBox.getChildren().addAll(homeLabel, scoreLabel, awayLabel);
 
-        // Winner label
+        // Result
         Label resultLabel;
         if (nextMatch.isDraw()) {
             resultLabel = new Label("DRAW");
@@ -127,13 +137,13 @@ public class MatchSimulationScreen {
                     ? "Unknown"
                     : scorer.getAvailablePlayers()
                             .get(random.nextInt(
-                                    scorer.getAvailablePlayers().size())).getName();
+                                    scorer.getAvailablePlayers().size()))
+                            .getName();
 
             addEvent(minute + "' ⚽ GOAL! " + playerName
                     + " (" + scorer.getName() + ")");
         }
 
-        // Random events
         if (random.nextBoolean()) {
             addEvent(random.nextInt(90) + "' 🟡 Yellow Card");
         }
@@ -150,11 +160,14 @@ public class MatchSimulationScreen {
     }
 
     private Match getNextMatch() {
-        int week = facade.getSeason().getCurrentWeek();
-        List<Match> matches = facade.getLeague()
-                .getFixture().getMatchesForRound(week);
-        for (Match m : matches) {
-            if (!m.isPlayed()) return m;
+        for (int week = 1; week <= facade.getLeague()
+                .getFixture().getTotalRounds(); week++) {
+            List<Match> matches = facade.getLeague()
+                    .getFixture().getMatchesForRound(week);
+            for (Match m : matches) {
+                if (!m.isPlayed())
+                    return m;
+            }
         }
         return null;
     }
