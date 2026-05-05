@@ -1,13 +1,9 @@
 package com.sportsmanager.ui;
 
-import java.util.List;
-import java.util.Random;
-
 import com.sportsmanager.app.MainApp;
 import com.sportsmanager.domain.Match;
 import com.sportsmanager.domain.Team;
 import com.sportsmanager.engine.GameFacade;
-
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -16,6 +12,9 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+
+import java.util.List;
+import java.util.Random;
 
 public class MatchSimulationScreen {
 
@@ -165,8 +164,7 @@ public class MatchSimulationScreen {
             List<Match> matches = facade.getLeague()
                     .getFixture().getMatchesForRound(week);
             for (Match m : matches) {
-                if (!m.isPlayed())
-                    return m;
+                if (!m.isPlayed()) return m;
             }
         }
         return null;
