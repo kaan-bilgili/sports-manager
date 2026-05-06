@@ -95,54 +95,65 @@ public class LeagueDashboardScreen {
     }
 
     private TableView<StandingEntry> buildStandings() {
-        TableView<StandingEntry> t = new TableView<>();
-        t.setStyle("-fx-background-color: #1a1a2e;");
+    boolean isBasketball = facade.getSport().getSportName()
+            .equals("Basketball");
 
-        TableColumn<StandingEntry, String> teamCol = new TableColumn<>("Team");
-        teamCol.setCellValueFactory(d ->
-                new SimpleStringProperty(d.getValue().getTeam().getName()));
-        teamCol.setPrefWidth(160);
+    TableView<StandingEntry> t = new TableView<>();
+    t.setStyle("-fx-background-color: #1a1a2e;");
 
-        TableColumn<StandingEntry, Integer> pCol = new TableColumn<>("P");
-        pCol.setCellValueFactory(d ->
-                new SimpleIntegerProperty(
-                        d.getValue().getMatchesPlayed()).asObject());
-        pCol.setPrefWidth(45);
+    TableColumn<StandingEntry, String> teamCol = new TableColumn<>("Team");
+    teamCol.setCellValueFactory(d ->
+            new SimpleStringProperty(d.getValue().getTeam().getName()));
+    teamCol.setPrefWidth(160);
 
-        TableColumn<StandingEntry, Integer> wCol = new TableColumn<>("W");
-        wCol.setCellValueFactory(d ->
-                new SimpleIntegerProperty(
-                        d.getValue().getWins()).asObject());
-        wCol.setPrefWidth(45);
+    TableColumn<StandingEntry, Integer> pCol = new TableColumn<>("P");
+    pCol.setCellValueFactory(d ->
+            new SimpleIntegerProperty(
+                    d.getValue().getMatchesPlayed()).asObject());
+    pCol.setPrefWidth(45);
 
+    TableColumn<StandingEntry, Integer> wCol = new TableColumn<>("W");
+    wCol.setCellValueFactory(d ->
+            new SimpleIntegerProperty(
+                    d.getValue().getWins()).asObject());
+    wCol.setPrefWidth(45);
+
+    t.getColumns().addAll(teamCol, pCol, wCol);
+
+    if (!isBasketball) {
         TableColumn<StandingEntry, Integer> dCol = new TableColumn<>("D");
         dCol.setCellValueFactory(d ->
                 new SimpleIntegerProperty(
                         d.getValue().getDraws()).asObject());
         dCol.setPrefWidth(45);
-
-        TableColumn<StandingEntry, Integer> lCol = new TableColumn<>("L");
-        lCol.setCellValueFactory(d ->
-                new SimpleIntegerProperty(
-                        d.getValue().getLosses()).asObject());
-        lCol.setPrefWidth(45);
-
-        TableColumn<StandingEntry, Integer> gdCol = new TableColumn<>("GD");
-        gdCol.setCellValueFactory(d ->
-                new SimpleIntegerProperty(
-                        d.getValue().getGoalDifference()).asObject());
-        gdCol.setPrefWidth(50);
-
-        TableColumn<StandingEntry, Integer> ptsCol = new TableColumn<>("Pts");
-        ptsCol.setCellValueFactory(d ->
-                new SimpleIntegerProperty(
-                        d.getValue().getPoints()).asObject());
-        ptsCol.setPrefWidth(50);
-
-        t.getColumns().addAll(teamCol, pCol, wCol, dCol, lCol, gdCol, ptsCol);
-        t.getItems().addAll(facade.getLeague().getSortedStandings());
-        return t;
+        t.getColumns().add(dCol);
     }
+
+    TableColumn<StandingEntry, Integer> lCol = new TableColumn<>("L");
+    lCol.setCellValueFactory(d ->
+            new SimpleIntegerProperty(
+                    d.getValue().getLosses()).asObject());
+    lCol.setPrefWidth(45);
+
+    TableColumn<StandingEntry, Integer> gdCol = new TableColumn<>(
+            isBasketball ? "Diff" : "GD");
+    gdCol.setCellValueFactory(d ->
+            new SimpleIntegerProperty(
+                    d.getValue().getGoalDifference()).asObject());
+    gdCol.setPrefWidth(60);
+
+    TableColumn<StandingEntry, Integer> ptsCol = new TableColumn<>("Pts");
+    ptsCol.setCellValueFactory(d ->
+            new SimpleIntegerProperty(
+                    isBasketball
+                    ? d.getValue().getBasketballPoints()
+                    : d.getValue().getPoints()).asObject());
+    ptsCol.setPrefWidth(50);
+
+    t.getColumns().addAll(lCol, gdCol, ptsCol);
+    t.getItems().addAll(facade.getLeague().getSortedStandings());
+    return t;
+}
 
     private ScrollPane buildFixture() {
         VBox list = new VBox(6);
