@@ -95,51 +95,53 @@ public class LeagueDashboardScreen {
     }
 
     private TableView<StandingEntry> buildStandings() {
+        boolean isBasketball = facade.getSport().getSportName()
+                .equals("Basketball");
+
         TableView<StandingEntry> t = new TableView<>();
         t.setStyle("-fx-background-color: #1a1a2e;");
 
         TableColumn<StandingEntry, String> teamCol = new TableColumn<>("Team");
-        teamCol.setCellValueFactory(d ->
-                new SimpleStringProperty(d.getValue().getTeam().getName()));
+        teamCol.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getTeam().getName()));
         teamCol.setPrefWidth(160);
 
         TableColumn<StandingEntry, Integer> pCol = new TableColumn<>("P");
-        pCol.setCellValueFactory(d ->
-                new SimpleIntegerProperty(
-                        d.getValue().getMatchesPlayed()).asObject());
+        pCol.setCellValueFactory(d -> new SimpleIntegerProperty(
+                d.getValue().getMatchesPlayed()).asObject());
         pCol.setPrefWidth(45);
 
         TableColumn<StandingEntry, Integer> wCol = new TableColumn<>("W");
-        wCol.setCellValueFactory(d ->
-                new SimpleIntegerProperty(
-                        d.getValue().getWins()).asObject());
+        wCol.setCellValueFactory(d -> new SimpleIntegerProperty(
+                d.getValue().getWins()).asObject());
         wCol.setPrefWidth(45);
 
-        TableColumn<StandingEntry, Integer> dCol = new TableColumn<>("D");
-        dCol.setCellValueFactory(d ->
-                new SimpleIntegerProperty(
-                        d.getValue().getDraws()).asObject());
-        dCol.setPrefWidth(45);
+        t.getColumns().addAll(teamCol, pCol, wCol);
+
+        if (!isBasketball) {
+            TableColumn<StandingEntry, Integer> dCol = new TableColumn<>("D");
+            dCol.setCellValueFactory(d -> new SimpleIntegerProperty(
+                    d.getValue().getDraws()).asObject());
+            dCol.setPrefWidth(45);
+            t.getColumns().add(dCol);
+        }
 
         TableColumn<StandingEntry, Integer> lCol = new TableColumn<>("L");
-        lCol.setCellValueFactory(d ->
-                new SimpleIntegerProperty(
-                        d.getValue().getLosses()).asObject());
+        lCol.setCellValueFactory(d -> new SimpleIntegerProperty(
+                d.getValue().getLosses()).asObject());
         lCol.setPrefWidth(45);
 
-        TableColumn<StandingEntry, Integer> gdCol = new TableColumn<>("GD");
-        gdCol.setCellValueFactory(d ->
-                new SimpleIntegerProperty(
-                        d.getValue().getGoalDifference()).asObject());
-        gdCol.setPrefWidth(50);
+        TableColumn<StandingEntry, Integer> gdCol = new TableColumn<>(
+                isBasketball ? "Diff" : "GD");
+        gdCol.setCellValueFactory(d -> new SimpleIntegerProperty(
+                d.getValue().getGoalDifference()).asObject());
+        gdCol.setPrefWidth(60);
 
         TableColumn<StandingEntry, Integer> ptsCol = new TableColumn<>("Pts");
-        ptsCol.setCellValueFactory(d ->
-                new SimpleIntegerProperty(
-                        d.getValue().getPoints()).asObject());
+        ptsCol.setCellValueFactory(d -> new SimpleIntegerProperty(
+                d.getValue().getPoints()).asObject());
         ptsCol.setPrefWidth(50);
 
-        t.getColumns().addAll(teamCol, pCol, wCol, dCol, lCol, gdCol, ptsCol);
+        t.getColumns().addAll(lCol, gdCol, ptsCol);
         t.getItems().addAll(facade.getLeague().getSortedStandings());
         return t;
     }
@@ -173,6 +175,14 @@ public class LeagueDashboardScreen {
         b.setStyle("-fx-background-color: #1a1a2e; -fx-text-fill: white; "
                 + "-fx-border-color: #e94560; -fx-border-width: 1px; "
                 + "-fx-cursor: hand;");
+        b.setOnMouseEntered(e -> b.setStyle(
+                "-fx-background-color: #e94560; -fx-text-fill: white; "
+                        + "-fx-border-color: #e94560; -fx-border-width: 1px; "
+                        + "-fx-cursor: hand;"));
+        b.setOnMouseExited(e -> b.setStyle(
+                "-fx-background-color: #1a1a2e; -fx-text-fill: white; "
+                        + "-fx-border-color: #e94560; -fx-border-width: 1px; "
+                        + "-fx-cursor: hand;"));
         return b;
     }
 
