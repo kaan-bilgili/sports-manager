@@ -34,6 +34,15 @@ public class Season implements Serializable {
         }
     }
 
+    public void nextWeek() {
+        if (finished) return;
+        if (currentWeek >= league.getFixture().getTotalRounds()) {
+            finished = true;
+        } else {
+            currentWeek++;
+        }
+    }
+
     public boolean isFinished() { return finished; }
     public int getCurrentWeek() { return currentWeek; }
     public int getSeasonNumber() { return seasonNumber; }

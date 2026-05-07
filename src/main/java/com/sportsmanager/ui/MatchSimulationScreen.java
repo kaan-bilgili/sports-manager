@@ -13,6 +13,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -50,7 +51,6 @@ public class MatchSimulationScreen {
         content.setPadding(new Insets(20));
         content.setAlignment(Pos.TOP_CENTER);
 
-        // Get next unplayed match
         Match nextMatch = getNextMatch();
 
         if (nextMatch == null) {
@@ -60,9 +60,17 @@ public class MatchSimulationScreen {
             return content;
         }
 
-        // Simulate the match
         nextMatch.simulate();
         facade.getLeague().updateStandings(nextMatch);
+
+        boolean weekComplete = facade.getLeague()
+                .getFixture()
+                .getMatchesForRound(facade.getSeason().getCurrentWeek())
+                .stream().allMatch(Match::isPlayed);
+
+        if (weekComplete) {
+            facade.getSeason().nextWeek();
+        }
 
         // Score display
         HBox scoreBox = new HBox(20);
@@ -85,7 +93,6 @@ public class MatchSimulationScreen {
 
         scoreBox.getChildren().addAll(homeLabel, scoreLabel, awayLabel);
 
-        // Winner label
         Label resultLabel;
         if (nextMatch.isDraw()) {
             resultLabel = new Label("DRAW");
@@ -95,7 +102,6 @@ public class MatchSimulationScreen {
         resultLabel.setStyle("-fx-text-fill: #4caf50; -fx-font-size: 16px; "
                 + "-fx-font-weight: bold;");
 
-        // Event log
         eventLog = new VBox(6);
         eventLog.setPadding(new Insets(10));
         eventLog.setStyle("-fx-background-color: #16213e;");
@@ -116,30 +122,86 @@ public class MatchSimulationScreen {
     }
 
     private void generateEvents(Match match) {
+        boolean isBasketball = facade.getSport().getSportName()
+                .equals("Basketball");
+        List<String> events = new ArrayList<>();
         Random random = new Random();
+
+        if (isBasketball) {
+            generateBasketballEvents(match, events, random);
+        } else {
+            generateFootballEvents(match, events, random);
+        }
+
+        // Kronolojik sırala
+        events.sort((a, b) -> {
+            try {
+                int minA = Integer.parseInt(a.split("'")[0].trim());
+                int minB = Integer.parseInt(b.split("'")[0].trim());
+                return Integer.compare(minA, minB);
+            } catch (NumberFormatException e) {
+                return 0;
+            }
+        });
+
+        for (String event : events) {
+            addEvent(event);
+        }
+    }
+
+    private void generateFootballEvents(Match match,
+            List<String> events, Random random) {
         int totalGoals = match.getHomeScore() + match.getAwayScore();
 
         for (int i = 0; i < totalGoals; i++) {
             int minute = 1 + random.nextInt(90);
             boolean isHome = i < match.getHomeScore();
             Team scorer = isHome ? match.getHomeTeam() : match.getAwayTeam();
-            String playerName = scorer.getAvailablePlayers().isEmpty()
-                    ? "Unknown"
-                    : scorer.getAvailablePlayers()
-                            .get(random.nextInt(
-                                    scorer.getAvailablePlayers().size())).getName();
-
-            addEvent(minute + "' ⚽ GOAL! " + playerName
+            String playerName = getRandomPlayer(scorer, random);
+            events.add(minute + "' ⚽ GOAL! " + playerName
                     + " (" + scorer.getName() + ")");
         }
 
-        // Random events
         if (random.nextBoolean()) {
-            addEvent(random.nextInt(90) + "' 🟡 Yellow Card");
+            int minute = 1 + random.nextInt(90);
+            Team team = random.nextBoolean()
+                    ? match.getHomeTeam() : match.getAwayTeam();
+            events.add(minute + "' 🟡 Yellow Card — "
+                    + getRandomPlayer(team, random)
+                    + " (" + team.getName() + ")");
         }
+
         if (random.nextInt(5) == 0) {
-            addEvent(random.nextInt(90) + "' 🔴 Red Card");
+            int minute = 1 + random.nextInt(90);
+            Team team = random.nextBoolean()
+                    ? match.getHomeTeam() : match.getAwayTeam();
+            events.add(minute + "' 🔴 Red Card — "
+                    + getRandomPlayer(team, random)
+                    + " (" + team.getName() + ")");
         }
+    }
+
+    private void generateBasketballEvents(Match match,
+            List<String> events, Random random) {
+        String[] shotTypes = {"2PT", "3PT", "FT"};
+        int totalEvents = (match.getHomeScore() + match.getAwayScore()) / 3;
+
+        for (int i = 0; i < totalEvents; i++) {
+            int minute = 1 + random.nextInt(48);
+            boolean isHome = random.nextBoolean();
+            Team team = isHome ? match.getHomeTeam() : match.getAwayTeam();
+            String shot = shotTypes[random.nextInt(shotTypes.length)];
+            String playerName = getRandomPlayer(team, random);
+            events.add(minute + "' 🏀 " + shot + " — "
+                    + playerName + " (" + team.getName() + ")");
+        }
+    }
+
+    private String getRandomPlayer(Team team, Random random) {
+        if (team.getAvailablePlayers().isEmpty()) return "Unknown";
+        return team.getAvailablePlayers()
+                .get(random.nextInt(team.getAvailablePlayers().size()))
+                .getName();
     }
 
     private void addEvent(String text) {
@@ -150,11 +212,13 @@ public class MatchSimulationScreen {
     }
 
     private Match getNextMatch() {
-        int week = facade.getSeason().getCurrentWeek();
-        List<Match> matches = facade.getLeague()
-                .getFixture().getMatchesForRound(week);
-        for (Match m : matches) {
-            if (!m.isPlayed()) return m;
+        for (int week = 1; week <= facade.getLeague()
+                .getFixture().getTotalRounds(); week++) {
+            List<Match> matches = facade.getLeague()
+                    .getFixture().getMatchesForRound(week);
+            for (Match m : matches) {
+                if (!m.isPlayed()) return m;
+            }
         }
         return null;
     }
