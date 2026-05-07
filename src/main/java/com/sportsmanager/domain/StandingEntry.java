@@ -21,7 +21,6 @@ public class StandingEntry implements Serializable {
         this.goalsAgainst = 0;
     }
 
-    // Football
     public void recordWin(int goalsFor, int goalsAgainst) {
         this.wins++;
         this.goalsFor += goalsFor;
@@ -40,25 +39,8 @@ public class StandingEntry implements Serializable {
         this.goalsAgainst += goalsAgainst;
     }
 
-    // Basketball — W=2, L=1
-    public void recordBasketballWin(int ptsFor, int ptsAgainst) {
-        this.wins++;
-        this.goalsFor += ptsFor;
-        this.goalsAgainst += ptsAgainst;
-    }
-
-    public void recordBasketballLoss(int ptsFor, int ptsAgainst) {
-        this.losses++;
-        this.goalsFor += ptsFor;
-        this.goalsAgainst += ptsAgainst;
-    }
-
     public int getPoints() {
         return (wins * 3) + (draws * 1);
-    }
-
-    public int getBasketballPoints() {
-        return (wins * 2) + (losses * 1);
     }
 
     public int getGoalDifference() {

@@ -37,7 +37,7 @@ public class GameFacade implements Serializable {
     }
 
     public void initGame(int teamCount) {
-        league = new League(sport.getSportName() + " League", sport.getSportName());
+        league = new League(sport.getSportName() + " League");
 
         for (int i = 0; i < teamCount && i < TEAM_NAMES.length; i++) {
             Team team = sport.createTeam(TEAM_NAMES[i]);

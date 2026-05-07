@@ -11,22 +11,12 @@ public class League implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String name;
-    private String sportName;
     private List<Team> teams;
     private Fixture fixture;
     private Map<String, StandingEntry> standings;
 
     public League(String name) {
         this.name = name;
-        this.sportName = "Football";
-        this.teams = new ArrayList<>();
-        this.standings = new HashMap<>();
-        this.fixture = new Fixture();
-    }
-
-    public League(String name, String sportName) {
-        this.name = name;
-        this.sportName = sportName;
         this.teams = new ArrayList<>();
         this.standings = new HashMap<>();
         this.fixture = new Fixture();
@@ -52,27 +42,15 @@ public class League implements Serializable {
         int homeScore = match.getHomeScore();
         int awayScore = match.getAwayScore();
 
-        boolean isBasketball = "Basketball".equals(sportName);
-
         if (match.isDraw()) {
             homeEntry.recordDraw(homeScore, awayScore);
             awayEntry.recordDraw(awayScore, homeScore);
         } else if (match.getWinner() == match.getHomeTeam()) {
-            if (isBasketball) {
-                homeEntry.recordBasketballWin(homeScore, awayScore);
-                awayEntry.recordBasketballLoss(awayScore, homeScore);
-            } else {
-                homeEntry.recordWin(homeScore, awayScore);
-                awayEntry.recordLoss(awayScore, homeScore);
-            }
+            homeEntry.recordWin(homeScore, awayScore);
+            awayEntry.recordLoss(awayScore, homeScore);
         } else {
-            if (isBasketball) {
-                awayEntry.recordBasketballWin(awayScore, homeScore);
-                homeEntry.recordBasketballLoss(homeScore, awayScore);
-            } else {
-                awayEntry.recordWin(awayScore, homeScore);
-                homeEntry.recordLoss(homeScore, awayScore);
-            }
+            awayEntry.recordWin(awayScore, homeScore);
+            homeEntry.recordLoss(homeScore, awayScore);
         }
     }
 
@@ -86,7 +64,6 @@ public class League implements Serializable {
     }
 
     public String getName() { return name; }
-    public String getSportName() { return sportName; }
     public List<Team> getTeams() { return teams; }
     public Fixture getFixture() { return fixture; }
     public Map<String, StandingEntry> getStandings() { return standings; }
