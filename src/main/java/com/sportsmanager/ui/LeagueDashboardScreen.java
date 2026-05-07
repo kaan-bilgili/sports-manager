@@ -136,10 +136,13 @@ public class LeagueDashboardScreen {
                 d.getValue().getGoalDifference()).asObject());
         gdCol.setPrefWidth(60);
 
-        TableColumn<StandingEntry, Integer> ptsCol = new TableColumn<>("Pts");
-        ptsCol.setCellValueFactory(d -> new SimpleIntegerProperty(
-                d.getValue().getPoints()).asObject());
-        ptsCol.setPrefWidth(50);
+       TableColumn<StandingEntry, Integer> ptsCol = new TableColumn<>("Pts");
+ptsCol.setCellValueFactory(d ->
+        new SimpleIntegerProperty(
+                isBasketball
+                ? d.getValue().getBasketballPoints()
+                : d.getValue().getPoints()).asObject());
+ptsCol.setPrefWidth(50);
 
         t.getColumns().addAll(lCol, gdCol, ptsCol);
         t.getItems().addAll(facade.getLeague().getSortedStandings());

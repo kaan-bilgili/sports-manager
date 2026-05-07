@@ -37,23 +37,26 @@ public class GameFacade implements Serializable {
     }
 
     public void initGame(int teamCount) {
-        league = new League(sport.getSportName() + " League");
+    
+    league = new League(sport.getSportName() + " League",
+            sport.getSportName());
 
-        for (int i = 0; i < teamCount && i < TEAM_NAMES.length; i++) {
-            Team team = sport.createTeam(TEAM_NAMES[i]);
-            generatePlayers(team);
-            league.addTeam(team);
-        }
-
-        FixtureGenerator generator = new FixtureGenerator(sport);
-        league.setFixture(generator.generate(league.getTeams()));
-
-        season = new Season(1, league);
-
-        System.out.println("Game initialized: " + league.getName());
-        System.out.println("Teams: " + league.getTeams().size());
-        System.out.println("Total matches: " + league.getFixture().getTotalMatchCount());
+    for (int i = 0; i < teamCount && i < TEAM_NAMES.length; i++) {
+        Team team = sport.createTeam(TEAM_NAMES[i]);
+        generatePlayers(team);
+        league.addTeam(team);
     }
+
+    FixtureGenerator generator = new FixtureGenerator(sport);
+    league.setFixture(generator.generate(league.getTeams()));
+
+    season = new Season(1, league);
+
+    System.out.println("Game initialized: " + league.getName());
+    System.out.println("Teams: " + league.getTeams().size());
+    System.out.println("Total matches: "
+            + league.getFixture().getTotalMatchCount());
+}
 
     private void generatePlayers(Team team) {
         if (random == null)
