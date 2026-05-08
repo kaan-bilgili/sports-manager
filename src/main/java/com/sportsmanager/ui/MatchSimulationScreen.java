@@ -1,9 +1,14 @@
 package com.sportsmanager.ui;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 import com.sportsmanager.app.MainApp;
 import com.sportsmanager.domain.Match;
 import com.sportsmanager.domain.Team;
 import com.sportsmanager.engine.GameFacade;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -11,17 +16,13 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 
 public class MatchSimulationScreen {
 
     private BorderPane view;
     private GameFacade facade;
-    private VBox eventLog;
 
     public MatchSimulationScreen(GameFacade facade) {
         this.facade = facade;
@@ -46,10 +47,9 @@ public class MatchSimulationScreen {
         return lbl;
     }
 
-    private VBox buildContent() {
-        VBox content = new VBox(20);
-        content.setPadding(new Insets(20));
-        content.setAlignment(Pos.TOP_CENTER);
+    private HBox buildContent() {
+        HBox content = new HBox(10);
+        content.setPadding(new Insets(15));
 
         Match nextMatch = getNextMatch();
 
@@ -72,143 +72,325 @@ public class MatchSimulationScreen {
             facade.getSeason().nextWeek();
         }
 
-        // Score display
-        HBox scoreBox = new HBox(20);
-        scoreBox.setAlignment(Pos.CENTER);
-        scoreBox.setStyle("-fx-background-color: #16213e; -fx-padding: 20px; "
-                + "-fx-background-radius: 8px;");
+        boolean isBasketball = facade.getSport().getSportName()
+                .equals("Basketball");
 
-        Label homeLabel = new Label(nextMatch.getHomeTeam().getName());
-        homeLabel.setStyle("-fx-text-fill: white; -fx-font-size: 18px; "
-                + "-fx-font-weight: bold;");
+        // Generate events
+        List<String[]> events = generateEvents(nextMatch, isBasketball);
 
-        Label scoreLabel = new Label(nextMatch.getHomeScore()
-                + " — " + nextMatch.getAwayScore());
-        scoreLabel.setStyle("-fx-text-fill: #e94560; -fx-font-size: 36px; "
-                + "-fx-font-weight: bold;");
+        // Left panel — Home events
+        VBox leftPanel = buildEventPanel(
+                nextMatch.getHomeTeam().getName(),
+                events, true, "#e94560");
 
-        Label awayLabel = new Label(nextMatch.getAwayTeam().getName());
-        awayLabel.setStyle("-fx-text-fill: white; -fx-font-size: 18px; "
-                + "-fx-font-weight: bold;");
+        // Center panel — Score
+        VBox centerPanel = buildScorePanel(nextMatch);
 
-        scoreBox.getChildren().addAll(homeLabel, scoreLabel, awayLabel);
+        // Right panel — Away events
+        VBox rightPanel = buildEventPanel(
+                nextMatch.getAwayTeam().getName(),
+                events, false, "#4fc3f7");
 
-        Label resultLabel;
-        if (nextMatch.isDraw()) {
-            resultLabel = new Label("DRAW");
-        } else {
-            resultLabel = new Label(nextMatch.getWinner().getName() + " WINS!");
-        }
-        resultLabel.setStyle("-fx-text-fill: #4caf50; -fx-font-size: 16px; "
-                + "-fx-font-weight: bold;");
+        HBox.setHgrow(leftPanel, Priority.ALWAYS);
+        HBox.setHgrow(centerPanel, Priority.NEVER);
+        HBox.setHgrow(rightPanel, Priority.ALWAYS);
 
-        eventLog = new VBox(6);
-        eventLog.setPadding(new Insets(10));
-        eventLog.setStyle("-fx-background-color: #16213e;");
-
-        Label logTitle = new Label("Match Events");
-        logTitle.setStyle("-fx-text-fill: #e94560; -fx-font-weight: bold; "
-                + "-fx-font-size: 14px;");
-        eventLog.getChildren().add(logTitle);
-
-        generateEvents(nextMatch);
-
-        ScrollPane scroll = new ScrollPane(eventLog);
-        scroll.setPrefHeight(300);
-        scroll.setStyle("-fx-background-color: #16213e;");
-
-        content.getChildren().addAll(scoreBox, resultLabel, scroll);
+        content.getChildren().addAll(leftPanel, centerPanel, rightPanel);
         return content;
     }
 
-    private void generateEvents(Match match) {
+    private VBox buildScorePanel(Match match) {
+        VBox panel = new VBox(10);
+        panel.setAlignment(Pos.TOP_CENTER);
+        panel.setPrefWidth(200);
+        panel.setStyle("-fx-background-color: #16213e; "
+                + "-fx-padding: 15px; -fx-background-radius: 8px;");
+
+        // Score
+        Label homeScore = new Label(String.valueOf(match.getHomeScore()));
+        homeScore.setStyle("-fx-text-fill: #e94560; -fx-font-size: 42px; "
+                + "-fx-font-weight: bold;");
+
+        Label dash = new Label("—");
+        dash.setStyle("-fx-text-fill: white; -fx-font-size: 28px;");
+
+        Label awayScore = new Label(String.valueOf(match.getAwayScore()));
+        awayScore.setStyle("-fx-text-fill: #4fc3f7; -fx-font-size: 42px; "
+                + "-fx-font-weight: bold;");
+
+        HBox scoreBox = new HBox(8, homeScore, dash, awayScore);
+        scoreBox.setAlignment(Pos.CENTER);
+
+        Label resultLabel;
+        if (match.isDraw()) {
+            resultLabel = new Label("DRAW");
+            resultLabel.setStyle("-fx-text-fill: #ffeb3b; "
+                    + "-fx-font-size: 14px; -fx-font-weight: bold;");
+        } else {
+            resultLabel = new Label(match.getWinner().getName() + "\nWINS!");
+            resultLabel.setStyle("-fx-text-fill: #4caf50; "
+                    + "-fx-font-size: 14px; -fx-font-weight: bold; "
+                    + "-fx-alignment: center;");
+        }
+
+        // Separator
+        Label sep = new Label("─────────");
+        sep.setStyle("-fx-text-fill: #444466;");
+
+        // Stats title
+        Label statsTitle = new Label("MATCH STATS");
+        statsTitle.setStyle("-fx-text-fill: #a0a0b0; -fx-font-size: 11px; "
+                + "-fx-font-weight: bold;");
+
         boolean isBasketball = facade.getSport().getSportName()
                 .equals("Basketball");
-        List<String> events = new ArrayList<>();
+
+        VBox stats = buildStats(match, isBasketball);
+
+        panel.getChildren().addAll(
+                scoreBox, resultLabel, sep, statsTitle, stats);
+        return panel;
+    }
+
+    private VBox buildStats(Match match, boolean isBasketball) { // Bu functionu sonradan ekledim.
+        VBox stats = new VBox(6);
+        stats.setAlignment(Pos.CENTER);
+
         Random random = new Random();
 
         if (isBasketball) {
-            generateBasketballEvents(match, events, random);
+            int homeScore = match.getHomeScore();
+            int awayScore = match.getAwayScore();
+
+            // Assists — skorun yaklaşık yarısı
+            int homeAssists = homeScore / 4 + random.nextInt(8);
+            int awayAssists = awayScore / 4 + random.nextInt(8);
+
+            // Rebounds — rastgele ama makul
+            int homeRebounds = 20 + random.nextInt(20);
+            int awayRebounds = 20 + random.nextInt(20);
+
+            // Steals, Blocks, Turnovers
+            int homeSteals = random.nextInt(10);
+            int awaySteals = random.nextInt(10);
+            int homeBlocks = random.nextInt(8);
+            int awayBlocks = random.nextInt(8);
+            int homeTurnovers = random.nextInt(15);
+            int awayTurnovers = random.nextInt(15);
+
+            addStat(stats, "Rebounds", homeRebounds, awayRebounds);
+            addStat(stats, "Assists", homeAssists, awayAssists);
+            addStat(stats, "Steals", homeSteals, awaySteals);
+            addStat(stats, "Blocks", homeBlocks, awayBlocks);
+            addStat(stats, "Turnovers", homeTurnovers, awayTurnovers);
+
         } else {
-            generateFootballEvents(match, events, random);
+            int homeGoals = match.getHomeScore();
+            int awayGoals = match.getAwayScore();
+
+            // Shots — gol sayısına bağlı (her gol için ~3-5 şut)
+            int homeShots = homeGoals * 3 + 2 + random.nextInt(8);
+            int awayShots = awayGoals * 3 + 2 + random.nextInt(8);
+
+            int homeOnTarget = homeGoals + random.nextInt(4);
+            int awayOnTarget = awayGoals + random.nextInt(4);
+
+            // Possession — toplam 100
+            int homePossession = 35 + random.nextInt(30);
+            int awayPossession = 100 - homePossession;
+
+            // Fouls, Corners
+            int homeFouls = 2 + random.nextInt(12);
+            int awayFouls = 2 + random.nextInt(12);
+            int homeCorners = random.nextInt(10);
+            int awayCorners = random.nextInt(10);
+
+            addStat(stats, "Shots", homeShots, awayShots);
+            addStat(stats, "On Target", homeOnTarget, awayOnTarget);
+            addStat(stats, "Possession %", homePossession, awayPossession);
+            addStat(stats, "Fouls", homeFouls, awayFouls);
+            addStat(stats, "Corners", homeCorners, awayCorners);
+        }
+
+        return stats;
+    }
+
+    private void addStat(VBox stats, String label, int home, int away) {
+        HBox row = new HBox();
+        row.setAlignment(Pos.CENTER);
+        row.setSpacing(5);
+
+        Label homeVal = new Label(String.valueOf(home));
+        homeVal.setStyle("-fx-text-fill: #e94560; -fx-font-size: 12px; "
+                + "-fx-font-weight: bold;");
+        homeVal.setPrefWidth(35);
+        homeVal.setAlignment(Pos.CENTER_RIGHT);
+
+        Label lbl = new Label(label);
+        lbl.setStyle("-fx-text-fill: #a0a0b0; -fx-font-size: 11px;");
+        lbl.setPrefWidth(80);
+        lbl.setAlignment(Pos.CENTER);
+
+        Label awayVal = new Label(String.valueOf(away));
+        awayVal.setStyle("-fx-text-fill: #4fc3f7; -fx-font-size: 12px; "
+                + "-fx-font-weight: bold;");
+        awayVal.setPrefWidth(35);
+        awayVal.setAlignment(Pos.CENTER_LEFT);
+
+        row.getChildren().addAll(homeVal, lbl, awayVal);
+        stats.getChildren().add(row);
+    }
+
+    private VBox buildEventPanel(String teamName,
+            List<String[]> events, boolean isHome, String color) {
+        VBox panel = new VBox(8);
+        panel.setStyle("-fx-background-color: #16213e; "
+                + "-fx-padding: 10px; -fx-background-radius: 8px;");
+
+        Label title = new Label(teamName);
+        title.setStyle("-fx-text-fill: " + color + "; "
+                + "-fx-font-weight: bold; -fx-font-size: 13px;");
+        title.setMaxWidth(Double.MAX_VALUE);
+        title.setAlignment(isHome ? Pos.CENTER_LEFT : Pos.CENTER_RIGHT);
+
+        VBox eventList = new VBox(4);
+        eventList.setStyle("-fx-background-color: #16213e; -fx-padding: 5px;");
+
+        for (String[] event : events) {
+            boolean eventIsHome = Boolean.parseBoolean(event[2]);
+            if (eventIsHome == isHome) {
+                Label lbl = new Label(event[0] + " " + event[1]);
+                lbl.setStyle("-fx-text-fill: white; -fx-font-size: 12px; "
+                        + "-fx-padding: 3px 5px;");
+                lbl.setWrapText(true);
+                lbl.setMaxWidth(Double.MAX_VALUE);
+                lbl.setAlignment(isHome ? Pos.CENTER_LEFT : Pos.CENTER_RIGHT);
+                eventList.getChildren().add(lbl);
+            }
+        }
+
+        if (eventList.getChildren().isEmpty()) {
+            Label empty = new Label("No events");
+            empty.setStyle("-fx-text-fill: #555577; -fx-font-size: 11px;");
+            eventList.getChildren().add(empty);
+        }
+
+        ScrollPane scroll = new ScrollPane(eventList);
+        scroll.setStyle("-fx-background-color: #16213e; "
+                + "-fx-background: #16213e;");
+        scroll.setPrefHeight(450);
+        scroll.setFitToWidth(true);
+
+        // Bu kritik — ScrollPane içini dark yapar
+        scroll.skinProperty().addListener((obs, oldSkin, newSkin) -> {
+            scroll.lookup(".viewport").setStyle(
+                    "-fx-background-color: #16213e;");
+        });
+
+        panel.getChildren().addAll(title, scroll);
+        return panel;
+    }
+
+    private List<String[]> generateEvents(Match match, boolean isBasketball) {
+        List<String[]> events = new ArrayList<>();
+        Random random = new Random();
+
+        if (isBasketball) {
+            String[] shotTypes = { "2PT", "3PT", "FT" };
+            int totalEvents = (match.getHomeScore() + match.getAwayScore()) / 3;
+
+            // Home events
+            int homeEvents = totalEvents / 2;
+            for (int i = 0; i < homeEvents; i++) {
+                int minute = 1 + random.nextInt(48);
+                String shot = shotTypes[random.nextInt(shotTypes.length)];
+                String player = getRandomPlayer(match.getHomeTeam(), random);
+                events.add(new String[] {
+                        minute + "'",
+                        "🏀 " + shot + " — " + player,
+                        "true"
+                });
+            }
+
+            // Away events
+            int awayEvents = totalEvents - homeEvents;
+            for (int i = 0; i < awayEvents; i++) {
+                int minute = 1 + random.nextInt(48);
+                String shot = shotTypes[random.nextInt(shotTypes.length)];
+                String player = getRandomPlayer(match.getAwayTeam(), random);
+                events.add(new String[] {
+                        minute + "'",
+                        "🏀 " + shot + " — " + player,
+                        "false"
+                });
+            }
+        } else {
+            // Home goals
+            for (int i = 0; i < match.getHomeScore(); i++) {
+                int minute = 1 + random.nextInt(90);
+                String player = getRandomPlayer(match.getHomeTeam(), random);
+                events.add(new String[] {
+                        minute + "'",
+                        "⚽ GOAL! " + player,
+                        "true"
+                });
+            }
+
+            // Away goals
+            for (int i = 0; i < match.getAwayScore(); i++) {
+                int minute = 1 + random.nextInt(90);
+                String player = getRandomPlayer(match.getAwayTeam(), random);
+                events.add(new String[] {
+                        minute + "'",
+                        "⚽ GOAL! " + player,
+                        "false"
+                });
+            }
+
+            // Cards
+            if (random.nextBoolean()) {
+                int minute = 1 + random.nextInt(90);
+                boolean isHome = random.nextBoolean();
+                Team team = isHome ? match.getHomeTeam() : match.getAwayTeam();
+                events.add(new String[] {
+                        minute + "'",
+                        "🟡 Yellow Card — " + getRandomPlayer(team, random),
+                        String.valueOf(isHome)
+                });
+            }
+
+            if (random.nextInt(5) == 0) {
+                int minute = 1 + random.nextInt(90);
+                boolean isHome = random.nextBoolean();
+                Team team = isHome ? match.getHomeTeam() : match.getAwayTeam();
+                events.add(new String[] {
+                        minute + "'",
+                        "🔴 Red Card — " + getRandomPlayer(team, random),
+                        String.valueOf(isHome)
+                });
+            }
         }
 
         // Kronolojik sırala
         events.sort((a, b) -> {
             try {
-                int minA = Integer.parseInt(a.split("'")[0].trim());
-                int minB = Integer.parseInt(b.split("'")[0].trim());
+                int minA = Integer.parseInt(a[0].replace("'", "").trim());
+                int minB = Integer.parseInt(b[0].replace("'", "").trim());
                 return Integer.compare(minA, minB);
             } catch (NumberFormatException e) {
                 return 0;
             }
         });
 
-        for (String event : events) {
-            addEvent(event);
-        }
-    }
-
-    private void generateFootballEvents(Match match,
-            List<String> events, Random random) {
-        int totalGoals = match.getHomeScore() + match.getAwayScore();
-
-        for (int i = 0; i < totalGoals; i++) {
-            int minute = 1 + random.nextInt(90);
-            boolean isHome = i < match.getHomeScore();
-            Team scorer = isHome ? match.getHomeTeam() : match.getAwayTeam();
-            String playerName = getRandomPlayer(scorer, random);
-            events.add(minute + "' ⚽ GOAL! " + playerName
-                    + " (" + scorer.getName() + ")");
-        }
-
-        if (random.nextBoolean()) {
-            int minute = 1 + random.nextInt(90);
-            Team team = random.nextBoolean()
-                    ? match.getHomeTeam() : match.getAwayTeam();
-            events.add(minute + "' 🟡 Yellow Card — "
-                    + getRandomPlayer(team, random)
-                    + " (" + team.getName() + ")");
-        }
-
-        if (random.nextInt(5) == 0) {
-            int minute = 1 + random.nextInt(90);
-            Team team = random.nextBoolean()
-                    ? match.getHomeTeam() : match.getAwayTeam();
-            events.add(minute + "' 🔴 Red Card — "
-                    + getRandomPlayer(team, random)
-                    + " (" + team.getName() + ")");
-        }
-    }
-
-    private void generateBasketballEvents(Match match,
-            List<String> events, Random random) {
-        String[] shotTypes = {"2PT", "3PT", "FT"};
-        int totalEvents = (match.getHomeScore() + match.getAwayScore()) / 3;
-
-        for (int i = 0; i < totalEvents; i++) {
-            int minute = 1 + random.nextInt(48);
-            boolean isHome = random.nextBoolean();
-            Team team = isHome ? match.getHomeTeam() : match.getAwayTeam();
-            String shot = shotTypes[random.nextInt(shotTypes.length)];
-            String playerName = getRandomPlayer(team, random);
-            events.add(minute + "' 🏀 " + shot + " — "
-                    + playerName + " (" + team.getName() + ")");
-        }
+        return events;
     }
 
     private String getRandomPlayer(Team team, Random random) {
-        if (team.getAvailablePlayers().isEmpty()) return "Unknown";
+        if (team.getAvailablePlayers().isEmpty())
+            return "Unknown";
         return team.getAvailablePlayers()
                 .get(random.nextInt(team.getAvailablePlayers().size()))
                 .getName();
-    }
-
-    private void addEvent(String text) {
-        Label lbl = new Label(text);
-        lbl.setStyle("-fx-text-fill: white; -fx-font-size: 13px; "
-                + "-fx-padding: 3px;");
-        eventLog.getChildren().add(lbl);
     }
 
     private Match getNextMatch() {
@@ -217,7 +399,8 @@ public class MatchSimulationScreen {
             List<Match> matches = facade.getLeague()
                     .getFixture().getMatchesForRound(week);
             for (Match m : matches) {
-                if (!m.isPlayed()) return m;
+                if (!m.isPlayed())
+                    return m;
             }
         }
         return null;
@@ -229,11 +412,19 @@ public class MatchSimulationScreen {
         box.setPadding(new Insets(15));
         box.setStyle("-fx-background-color: #16213e;");
 
-        Button continueBtn = new Button("Continue");
+        Button continueBtn = new Button("Continue →");
         continueBtn.setPrefSize(200, 40);
         continueBtn.setStyle("-fx-background-color: #e94560; "
                 + "-fx-text-fill: white; -fx-font-size: 14px; "
-                + "-fx-cursor: hand;");
+                + "-fx-cursor: hand; -fx-font-weight: bold;");
+        continueBtn.setOnMouseEntered(e -> continueBtn.setStyle(
+                "-fx-background-color: #ff6b6b; "
+                        + "-fx-text-fill: white; -fx-font-size: 14px; "
+                        + "-fx-cursor: hand; -fx-font-weight: bold;"));
+        continueBtn.setOnMouseExited(e -> continueBtn.setStyle(
+                "-fx-background-color: #e94560; "
+                        + "-fx-text-fill: white; -fx-font-size: 14px; "
+                        + "-fx-cursor: hand; -fx-font-weight: bold;"));
         continueBtn.setOnAction(e -> {
             LeagueDashboardScreen dashboard = new LeagueDashboardScreen(facade);
             javafx.scene.Scene scene = new javafx.scene.Scene(
