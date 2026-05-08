@@ -5,9 +5,9 @@ import com.sportsmanager.basketball.BasketballSport;
 import com.sportsmanager.engine.GameFacade;
 import com.sportsmanager.football.FootballSport;
 import com.sportsmanager.sport.Sport;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
@@ -20,8 +20,7 @@ public class SportSelectionScreen {
     private VBox view;
 
     // Normal style
-    private static final String BTN_NORMAL =
-            "-fx-background-color: #16213e; " +
+    private static final String BTN_NORMAL = "-fx-background-color: #16213e; " +
             "-fx-text-fill: white; " +
             "-fx-font-size: 16px; " +
             "-fx-border-color: #e94560; " +
@@ -29,8 +28,7 @@ public class SportSelectionScreen {
             "-fx-cursor: hand;";
 
     // Selected style
-    private static final String BTN_SELECTED =
-            "-fx-background-color: #e94560; " +
+    private static final String BTN_SELECTED = "-fx-background-color: #e94560; " +
             "-fx-text-fill: white; " +
             "-fx-font-size: 16px; " +
             "-fx-font-weight: bold; " +
@@ -83,10 +81,12 @@ public class SportSelectionScreen {
         startBtn.setOnAction(e -> {
             ToggleButton selected = (ToggleButton) group.getSelectedToggle();
             if (selected == null) {
-                Alert alert = new Alert(Alert.AlertType.WARNING);
+                javafx.scene.control.Alert alert = new javafx.scene.control.Alert(
+                        javafx.scene.control.Alert.AlertType.WARNING);
                 alert.setTitle("No Sport Selected");
                 alert.setHeaderText("Please select a sport");
-                alert.setContentText("Choose Football or Basketball to continue.");
+                alert.setContentText(
+                        "Choose Football or Basketball to continue.");
                 alert.showAndWait();
                 return;
             }
@@ -101,9 +101,9 @@ public class SportSelectionScreen {
             GameFacade facade = new GameFacade(selectedSport);
             facade.initGame(8);
 
-            LeagueDashboardScreen dashboard = new LeagueDashboardScreen(facade);
+            TeamSelectionScreen teamSelection = new TeamSelectionScreen(facade);
             javafx.scene.Scene scene = new javafx.scene.Scene(
-                    dashboard.getView(), 900, 650);
+                    teamSelection.getView(), 900, 650);
             MainApp.primaryStage.setScene(scene);
             MainApp.primaryStage.sizeToScene();
         });
@@ -137,18 +137,18 @@ public class SportSelectionScreen {
                 + "-fx-cursor: hand;");
         btn.setOnMouseEntered(e -> btn.setStyle(
                 "-fx-background-color: #e94560; "
-                + "-fx-text-fill: white; "
-                + "-fx-font-size: 14px; "
-                + "-fx-border-color: #e94560; "
-                + "-fx-border-width: 1px; "
-                + "-fx-cursor: hand;"));
+                        + "-fx-text-fill: white; "
+                        + "-fx-font-size: 14px; "
+                        + "-fx-border-color: #e94560; "
+                        + "-fx-border-width: 1px; "
+                        + "-fx-cursor: hand;"));
         btn.setOnMouseExited(e -> btn.setStyle(
                 "-fx-background-color: " + color + "; "
-                + "-fx-text-fill: white; "
-                + "-fx-font-size: 14px; "
-                + "-fx-border-color: #e94560; "
-                + "-fx-border-width: 1px; "
-                + "-fx-cursor: hand;"));
+                        + "-fx-text-fill: white; "
+                        + "-fx-font-size: 14px; "
+                        + "-fx-border-color: #e94560; "
+                        + "-fx-border-width: 1px; "
+                        + "-fx-cursor: hand;"));
         return btn;
     }
 

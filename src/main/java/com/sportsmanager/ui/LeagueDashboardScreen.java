@@ -1,9 +1,11 @@
 package com.sportsmanager.ui;
 
 import com.sportsmanager.app.MainApp;
+import com.sportsmanager.domain.Match;
 import com.sportsmanager.domain.StandingEntry;
 import com.sportsmanager.engine.GameFacade;
 import com.sportsmanager.engine.GameSaveManager;
+
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.control.Alert;
@@ -21,13 +23,11 @@ public class LeagueDashboardScreen {
     private GameFacade facade;
     private Button activeBtn;
 
-    private static final String BTN_NORMAL =
-            "-fx-background-color: #1a1a2e; -fx-text-fill: white; " +
+    private static final String BTN_NORMAL = "-fx-background-color: #1a1a2e; -fx-text-fill: white; " +
             "-fx-border-color: #e94560; -fx-border-width: 1px; " +
             "-fx-cursor: hand;";
 
-    private static final String BTN_ACTIVE =
-            "-fx-background-color: #e94560; -fx-text-fill: white; " +
+    private static final String BTN_ACTIVE = "-fx-background-color: #e94560; -fx-text-fill: white; " +
             "-fx-font-weight: bold; " +
             "-fx-border-color: #ff6b6b; -fx-border-width: 2px; " +
             "-fx-effect: dropshadow(gaussian, #e94560, 10, 0.5, 0, 0); " +
@@ -90,16 +90,28 @@ public class LeagueDashboardScreen {
             MainApp.primaryStage.sizeToScene();
         });
 
-        n.setOnAction(e -> {
-            if (!facade.isSeasonFinished()) {
+        n.setOnAction(e -> {// bura guncellendi!
+            if (facade.isSeasonFinished()) {
+                new javafx.scene.control.Alert(
+                        javafx.scene.control.Alert.AlertType.INFORMATION,
+                        "Champion: " + facade.getLeader().getName()).show();
+                return;
+            }
+
+            facade.simulateOtherMatches();
+
+            Match playerMatch = facade.getNextPlayerMatch();
+            if (playerMatch != null && !playerMatch.isPlayed()) {
                 MatchSimulationScreen sim = new MatchSimulationScreen(facade);
                 javafx.scene.Scene scene = new javafx.scene.Scene(
                         sim.getView(), 900, 650);
                 MainApp.primaryStage.setScene(scene);
                 MainApp.primaryStage.sizeToScene();
             } else {
-                new Alert(Alert.AlertType.INFORMATION,
-                        "Champion: " + facade.getLeader().getName()).show();
+                // Player maçı yoksa haftayı ilerlet
+                facade.getSeason().nextWeek();
+                view.setTop(buildHeader());
+                view.setCenter(buildStandings());
             }
         });
 
@@ -134,52 +146,68 @@ public class LeagueDashboardScreen {
         t.setStyle("-fx-background-color: #1a1a2e;");
 
         TableColumn<StandingEntry, String> teamCol = new TableColumn<>("Team");
-        teamCol.setCellValueFactory(d ->
-                new SimpleStringProperty(d.getValue().getTeam().getName()));
+        teamCol.setCellValueFactory(d -> new SimpleStringProperty(
+                d.getValue().getTeam().getName()));
         teamCol.setPrefWidth(160);
 
+        // Player takımını vurgula
+        teamCol.setCellFactory(col -> new javafx.scene.control.TableCell<StandingEntry, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(item);
+                    if (facade.getPlayerTeam() != null &&
+                            item.equals(facade.getPlayerTeam().getName())) {
+                        setStyle("-fx-text-fill: #e94560; "
+                                + "-fx-font-weight: bold;");
+                    } else {
+                        setStyle("-fx-text-fill: black;");
+                    }
+                }
+            }
+        });
+
         TableColumn<StandingEntry, Integer> pCol = new TableColumn<>("P");
-        pCol.setCellValueFactory(d ->
-                new SimpleIntegerProperty(
-                        d.getValue().getMatchesPlayed()).asObject());
+        pCol.setCellValueFactory(d -> new SimpleIntegerProperty(
+                d.getValue().getMatchesPlayed()).asObject());
         pCol.setPrefWidth(45);
 
         TableColumn<StandingEntry, Integer> wCol = new TableColumn<>("W");
-        wCol.setCellValueFactory(d ->
-                new SimpleIntegerProperty(
-                        d.getValue().getWins()).asObject());
+        wCol.setCellValueFactory(d -> new SimpleIntegerProperty(
+                d.getValue().getWins()).asObject());
         wCol.setPrefWidth(45);
 
         t.getColumns().addAll(teamCol, pCol, wCol);
 
         if (!isBasketball) {
             TableColumn<StandingEntry, Integer> dCol = new TableColumn<>("D");
-            dCol.setCellValueFactory(d ->
-                    new SimpleIntegerProperty(
-                            d.getValue().getDraws()).asObject());
+            dCol.setCellValueFactory(d -> new SimpleIntegerProperty(
+                    d.getValue().getDraws()).asObject());
             dCol.setPrefWidth(45);
             t.getColumns().add(dCol);
         }
 
         TableColumn<StandingEntry, Integer> lCol = new TableColumn<>("L");
-        lCol.setCellValueFactory(d ->
-                new SimpleIntegerProperty(
-                        d.getValue().getLosses()).asObject());
+        lCol.setCellValueFactory(d -> new SimpleIntegerProperty(
+                d.getValue().getLosses()).asObject());
         lCol.setPrefWidth(45);
 
         TableColumn<StandingEntry, Integer> gdCol = new TableColumn<>(
                 isBasketball ? "Diff" : "GD");
-        gdCol.setCellValueFactory(d ->
-                new SimpleIntegerProperty(
-                        d.getValue().getGoalDifference()).asObject());
+        gdCol.setCellValueFactory(d -> new SimpleIntegerProperty(
+                d.getValue().getGoalDifference()).asObject());
         gdCol.setPrefWidth(60);
 
         TableColumn<StandingEntry, Integer> ptsCol = new TableColumn<>("Pts");
-        ptsCol.setCellValueFactory(d ->
-                new SimpleIntegerProperty(
-                        isBasketball
+        ptsCol.setCellValueFactory(d -> new SimpleIntegerProperty(
+                isBasketball
                         ? d.getValue().getBasketballPoints()
-                        : d.getValue().getPoints()).asObject());
+                        : d.getValue().getPoints())
+                .asObject());
         ptsCol.setPrefWidth(50);
 
         t.getColumns().addAll(lCol, gdCol, ptsCol);
