@@ -5,9 +5,9 @@ import com.sportsmanager.basketball.BasketballSport;
 import com.sportsmanager.engine.GameFacade;
 import com.sportsmanager.football.FootballSport;
 import com.sportsmanager.sport.Sport;
-
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
@@ -18,6 +18,26 @@ import javafx.scene.layout.VBox;
 public class SportSelectionScreen {
 
     private VBox view;
+
+    // Normal style
+    private static final String BTN_NORMAL =
+            "-fx-background-color: #16213e; " +
+            "-fx-text-fill: white; " +
+            "-fx-font-size: 16px; " +
+            "-fx-border-color: #e94560; " +
+            "-fx-border-width: 2px; " +
+            "-fx-cursor: hand;";
+
+    // Selected style
+    private static final String BTN_SELECTED =
+            "-fx-background-color: #e94560; " +
+            "-fx-text-fill: white; " +
+            "-fx-font-size: 16px; " +
+            "-fx-font-weight: bold; " +
+            "-fx-border-color: #ff6b6b; " +
+            "-fx-border-width: 3px; " +
+            "-fx-effect: dropshadow(gaussian, #e94560, 15, 0.6, 0, 0); " +
+            "-fx-cursor: hand;";
 
     public SportSelectionScreen() {
         buildUI();
@@ -40,8 +60,19 @@ public class SportSelectionScreen {
 
         ToggleGroup group = new ToggleGroup();
 
-        ToggleButton footballBtn = createToggleButton("Football", group);
-        ToggleButton basketballBtn = createToggleButton("Basketball", group);
+        ToggleButton footballBtn = createToggleButton("⚽  Football", group);
+        ToggleButton basketballBtn = createToggleButton("🏀  Basketball", group);
+
+        // Update style on selection
+        group.selectedToggleProperty().addListener((obs, oldVal, newVal) -> {
+            footballBtn.setStyle(BTN_NORMAL);
+            basketballBtn.setStyle(BTN_NORMAL);
+            if (newVal == footballBtn) {
+                footballBtn.setStyle(BTN_SELECTED);
+            } else if (newVal == basketballBtn) {
+                basketballBtn.setStyle(BTN_SELECTED);
+            }
+        });
 
         HBox sportButtons = new HBox(20, footballBtn, basketballBtn);
         sportButtons.setAlignment(Pos.CENTER);
@@ -51,8 +82,14 @@ public class SportSelectionScreen {
 
         startBtn.setOnAction(e -> {
             ToggleButton selected = (ToggleButton) group.getSelectedToggle();
-            if (selected == null)
+            if (selected == null) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("No Sport Selected");
+                alert.setHeaderText("Please select a sport");
+                alert.setContentText("Choose Football or Basketball to continue.");
+                alert.showAndWait();
                 return;
+            }
 
             Sport selectedSport;
             if (selected == footballBtn) {
@@ -82,14 +119,9 @@ public class SportSelectionScreen {
     private ToggleButton createToggleButton(String text, ToggleGroup group) {
         ToggleButton btn = new ToggleButton(text);
         btn.setToggleGroup(group);
-        btn.setPrefWidth(180);
-        btn.setPrefHeight(80);
-        btn.setStyle("-fx-background-color: #16213e; "
-                + "-fx-text-fill: white; "
-                + "-fx-font-size: 16px; "
-                + "-fx-border-color: #e94560; "
-                + "-fx-border-width: 1px; "
-                + "-fx-cursor: hand;");
+        btn.setPrefWidth(200);
+        btn.setPrefHeight(90);
+        btn.setStyle(BTN_NORMAL);
         return btn;
     }
 
@@ -103,6 +135,20 @@ public class SportSelectionScreen {
                 + "-fx-border-color: #e94560; "
                 + "-fx-border-width: 1px; "
                 + "-fx-cursor: hand;");
+        btn.setOnMouseEntered(e -> btn.setStyle(
+                "-fx-background-color: #e94560; "
+                + "-fx-text-fill: white; "
+                + "-fx-font-size: 14px; "
+                + "-fx-border-color: #e94560; "
+                + "-fx-border-width: 1px; "
+                + "-fx-cursor: hand;"));
+        btn.setOnMouseExited(e -> btn.setStyle(
+                "-fx-background-color: " + color + "; "
+                + "-fx-text-fill: white; "
+                + "-fx-font-size: 14px; "
+                + "-fx-border-color: #e94560; "
+                + "-fx-border-width: 1px; "
+                + "-fx-cursor: hand;"));
         return btn;
     }
 

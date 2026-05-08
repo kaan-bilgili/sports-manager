@@ -20,6 +20,19 @@ public class TeamManagementScreen {
     private BorderPane view;
     private GameFacade facade;
     private Team selectedTeam;
+    private Button activeTeamBtn;
+
+    private static final String TEAM_BTN_NORMAL =
+            "-fx-background-color: #1a1a2e; -fx-text-fill: white; " +
+            "-fx-border-color: #e94560; -fx-border-width: 1px; " +
+            "-fx-cursor: hand; -fx-font-size: 12px;";
+
+    private static final String TEAM_BTN_SELECTED =
+            "-fx-background-color: #e94560; -fx-text-fill: white; " +
+            "-fx-font-weight: bold; " +
+            "-fx-border-color: #ff6b6b; -fx-border-width: 2px; " +
+            "-fx-effect: dropshadow(gaussian, #e94560, 10, 0.5, 0, 0); " +
+            "-fx-cursor: hand; -fx-font-size: 12px;";
 
     public TeamManagementScreen(GameFacade facade) {
         this.facade = facade;
@@ -57,18 +70,46 @@ public class TeamManagementScreen {
         for (Team team : facade.getLeague().getTeams()) {
             Button btn = new Button(team.getName());
             btn.setPrefSize(155, 34);
-            btn.setStyle("-fx-background-color: #1a1a2e; -fx-text-fill: white; "
-                    + "-fx-border-color: #e94560; -fx-border-width: 1px; "
-                    + "-fx-cursor: hand; -fx-font-size: 12px;");
+            btn.setStyle(TEAM_BTN_NORMAL);
+
+            // First team selected by default
+            if (team == selectedTeam) {
+                btn.setStyle(TEAM_BTN_SELECTED);
+                activeTeamBtn = btn;
+            }
+
             btn.setOnAction(e -> {
+                // Update selected state
+                if (activeTeamBtn != null) {
+                    activeTeamBtn.setStyle(TEAM_BTN_NORMAL);
+                }
+                activeTeamBtn = btn;
+                btn.setStyle(TEAM_BTN_SELECTED);
+
                 selectedTeam = team;
                 view.setTop(buildHeader());
                 view.setCenter(buildPlayerTable());
             });
+
+            btn.setOnMouseEntered(e -> {
+                if (btn != activeTeamBtn) {
+                    btn.setStyle("-fx-background-color: #2a2a4e; "
+                            + "-fx-text-fill: white; "
+                            + "-fx-border-color: #e94560; -fx-border-width: 1px; "
+                            + "-fx-cursor: hand; -fx-font-size: 12px;");
+                }
+            });
+
+            btn.setOnMouseExited(e -> {
+                if (btn != activeTeamBtn) {
+                    btn.setStyle(TEAM_BTN_NORMAL);
+                }
+            });
+
             box.getChildren().add(btn);
         }
 
-        Button backBtn = new Button("Back");
+        Button backBtn = new Button("← Back");
         backBtn.setPrefSize(155, 34);
         backBtn.setStyle("-fx-background-color: #e94560; -fx-text-fill: white; "
                 + "-fx-border-color: #e94560; -fx-border-width: 1px; "
