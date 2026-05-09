@@ -35,14 +35,22 @@ public class BasketballSport implements Sport {
         return new BasketballMatch(homeTeam, awayTeam);
     }
 
-    @Override
-    public int getSquadSize() {
-        return 5;
-    }
+   @Override
+public int getSquadSize() {
+    return 5; // Starters
+}
 
-    @Override
-    public int getSubstituteCount() {
-        return 7;
-    }
+@Override
+public int getSubstituteCount() {
+    return 7; // Bench
+}
+
+public int getTotalSquadSize() {
+    return 15;
+}
+
+public int getMatchdaySquadSize() {
+    return 12; // 5 + 7
+}
 
 }
