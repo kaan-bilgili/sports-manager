@@ -35,13 +35,22 @@ public class FootballSport implements Sport {
         return new FootballMatch(homeTeam, awayTeam);
     }
 
-    @Override
-    public int getSquadSize() {
-        return 11;
-    }
+    
+   @Override
+public int getSquadSize() {
+    return 11; // Starting lineup
+}
 
-    @Override
-    public int getSubstituteCount() {
-        return 3;
-    }
+@Override
+public int getSubstituteCount() {
+    return 7; // Bench
+}
+
+public int getTotalSquadSize() {
+    return 22; // Total players
+}
+
+public int getMatchdaySquadSize() {
+    return 18; // 11 + 7
+}
 }
