@@ -3,7 +3,6 @@ package com.sportsmanager.ui;
 import com.sportsmanager.app.MainApp;
 import com.sportsmanager.engine.GameFacade;
 import com.sportsmanager.engine.GameSaveManager;
-
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
@@ -23,20 +22,21 @@ public class MainMenuScreen {
         view = new VBox(20);
         view.setAlignment(Pos.CENTER);
         view.setPadding(new Insets(50));
-        view.setStyle("-fx-background-color: #1a1a2e;");
+        view.setStyle("-fx-background-color: " + AppStyle.BG_MAIN + ";");
         view.setPrefHeight(650);
         view.setPrefWidth(900);
 
         Label title = new Label("Sports Manager");
         title.setStyle("-fx-font-size: 42px; -fx-font-weight: bold; "
-                + "-fx-text-fill: #e94560;");
+                + "-fx-text-fill: " + AppStyle.ACCENT_ORANGE + ";");
 
         Label subtitle = new Label("Manage your team to glory");
-        subtitle.setStyle("-fx-font-size: 16px; -fx-text-fill: #a0a0b0;");
+        subtitle.setStyle("-fx-font-size: 16px; -fx-text-fill: "
+                + AppStyle.TEXT_SECONDARY + ";");
 
-        Button newGameBtn = createButton("New Game", "#e94560");
-        Button loadGameBtn = createButton("Load Game", "#16213e");
-        Button exitBtn = createButton("Exit", "#16213e");
+        Button newGameBtn = createButton("New Game", true);
+        Button loadGameBtn = createButton("Load Game", false);
+        Button exitBtn = createButton("Exit", false);
 
         newGameBtn.setOnAction(e -> MainApp.showSportSelection());
 
@@ -51,7 +51,8 @@ public class MainMenuScreen {
             } else {
                 try {
                     GameFacade facade = saveManager.load();
-                    LeagueDashboardScreen dashboard = new LeagueDashboardScreen(facade);
+                    LeagueDashboardScreen dashboard =
+                            new LeagueDashboardScreen(facade);
                     javafx.scene.Scene scene = new javafx.scene.Scene(
                             dashboard.getView(), 900, 650);
                     MainApp.primaryStage.setScene(scene);
@@ -71,19 +72,22 @@ public class MainMenuScreen {
         VBox buttons = new VBox(10, newGameBtn, loadGameBtn, exitBtn);
         buttons.setAlignment(Pos.CENTER);
 
-        view.getChildren().addAll(title, subtitle, buttons);
+        // Footer
+        Label footer = new Label("Team Trinity  •  CE 216  •  Spring 2026");
+        footer.setStyle("-fx-font-size: 11px; -fx-text-fill: #475569;");
+
+        view.getChildren().addAll(title, subtitle, buttons, footer);
     }
 
-    private Button createButton(String text, String color) {
+    private Button createButton(String text, boolean primary) {
         Button btn = new Button(text);
         btn.setPrefWidth(250);
         btn.setPrefHeight(45);
-        btn.setStyle("-fx-background-color: " + color + "; "
-                + "-fx-text-fill: white; "
-                + "-fx-font-size: 14px; "
-                + "-fx-border-color: #e94560; "
-                + "-fx-border-width: 1px; "
-                + "-fx-cursor: hand;");
+        btn.setStyle(primary ? AppStyle.BTN_PRIMARY : AppStyle.BTN_NORMAL);
+        btn.setOnMouseEntered(e -> btn.setStyle(
+                primary ? AppStyle.BTN_PRIMARY_HOVER : AppStyle.BTN_HOVER));
+        btn.setOnMouseExited(e -> btn.setStyle(
+                primary ? AppStyle.BTN_PRIMARY : AppStyle.BTN_NORMAL));
         return btn;
     }
 
