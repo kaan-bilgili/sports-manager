@@ -21,21 +21,37 @@ public class GameFacade implements Serializable {
     private Team playerTeam;
     private transient Random random = new Random();
 
-    private static final String[] FOOTBALL_TEAM_NAMES = {
-    "Galatasaray", "Fenerbahce", "Besiktas", "Trabzonspor",
-    "Basaksehir", "Sivasspor", "Alanyaspor", "Antalyaspor"
+   private static final String[] FOOTBALL_TEAM_NAMES = {
+    "🦅 Galatasaray",
+    "🦁 Fenerbahce",
+    "🦋 Besiktas",
+    "⚡ Trabzonspor",
+    "🌊 Basaksehir",
+    "🔥 Sivasspor",
+    "🌙 Alanyaspor",
+    "🐯 Antalyaspor"
 };
 
 private static final String[] BASKETBALL_TEAM_NAMES = {
-    "Lakers", "Celtics", "Bulls", "Warriors",
-    "Knicks", "Heat", "Spurs", "Nets"
+    "🏆 Lakers",
+    "🍀 Celtics",
+    "🐂 Bulls",
+    "⚔️ Warriors",
+    "🗽 Knicks",
+    "🌡️ Heat",
+    "🤠 Spurs",
+    "🕸️ Nets"
 };
 
+
     private static final String[] PLAYER_NAMES = {
-            "Ali", "Veli", "Mehmet", "Ahmet", "Mustafa",
-            "Hasan", "Huseyin", "Ibrahim", "Ismail", "Osman",
-            "Yusuf", "Murat", "Emre", "Burak", "Arda"
-    };
+    // Erkek
+    "Ali", "Mehmet", "Ahmet", "Mustafa", "Hasan",
+    "Huseyin", "Ibrahim", "Murat", "Emre", "Burak",
+    // Kadın
+    "Zeynep", "Ayse", "Fatma", "Elif", "Selin",
+    "Merve", "Ceren", "Deniz", "Nisan", "Yaren"
+};
 
     public GameFacade(Sport sport) {
         this.sport = sport;

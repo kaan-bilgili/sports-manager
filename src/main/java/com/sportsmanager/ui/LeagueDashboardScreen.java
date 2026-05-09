@@ -144,7 +144,7 @@ public class LeagueDashboardScreen {
                         setStyle("-fx-text-fill: " + AppStyle.BG_PANEL
                                 + "; -fx-font-weight: bold;");
                     } else {
-                        setStyle("-fx-text-fill: white;");
+                        setStyle("-fx-text-fill: #94A3B8; -fx-font-weight: bold;");
                     }
                 }
             }
@@ -222,17 +222,55 @@ return t;
                             + "-fx-border-radius: 8px;");
 
                     Label weekLabel = new Label("Week " + entry.getKey());
-                    weekLabel.setStyle("-fx-text-fill: " + AppStyle.ACCENT_BLUE
-                            + "; -fx-font-weight: bold; -fx-font-size: 14px;");
-                    weekBox.getChildren().add(weekLabel);
+boolean isCurrentWeek = entry.getKey() == facade.getSeason().getCurrentWeek();
 
-                    entry.getValue().forEach(match -> {
-                        Label matchLabel = new Label(match.toString());
-                        matchLabel.setStyle("-fx-text-fill: white; "
-                                + "-fx-font-size: 13px; -fx-padding: 3px 0;");
-                        matchLabel.setMaxWidth(Double.MAX_VALUE);
-                        weekBox.getChildren().add(matchLabel);
-                    });
+weekLabel.setStyle("-fx-text-fill: "
+        + (isCurrentWeek ? AppStyle.ACCENT_ORANGE : AppStyle.ACCENT_BLUE)
+        + "; -fx-font-weight: bold; -fx-font-size: 14px;");
+
+if (isCurrentWeek) {
+    weekBox.setStyle(
+            "-fx-background-color: #1E3A5F; "
+            + "-fx-padding: 12px; "
+            + "-fx-background-radius: 8px; "
+            + "-fx-border-color: " + AppStyle.ACCENT_ORANGE + "; "
+            + "-fx-border-width: 2px; "
+            + "-fx-border-radius: 8px;");
+} else {
+    weekBox.setStyle(
+            "-fx-background-color: " + AppStyle.BG_PANEL + "; "
+            + "-fx-padding: 12px; "
+            + "-fx-background-radius: 8px; "
+            + "-fx-border-color: " + AppStyle.ACCENT_BLUE + "; "
+            + "-fx-border-width: 1px; "
+            + "-fx-border-radius: 8px;");
+}
+
+                   entry.getValue().forEach(match -> {
+    int currentWeek = facade.getSeason().getCurrentWeek();
+    
+    boolean isPlayed = match.isPlayed();
+
+    Label matchLabel = new Label(match.toString());
+    matchLabel.setMaxWidth(Double.MAX_VALUE);
+
+    if (isPlayed) {
+        // Oynanan maç — gri
+        matchLabel.setStyle("-fx-text-fill: #4A5568; "
+                + "-fx-font-size: 13px; -fx-padding: 3px 0;");
+    } else if (isCurrentWeek) {
+        // Bu haftanın maçı — parlak mavi
+        matchLabel.setStyle("-fx-text-fill: " + AppStyle.ACCENT_BLUE + "; "
+                + "-fx-font-size: 13px; -fx-font-weight: bold; "
+                + "-fx-padding: 3px 0;");
+    } else {
+        // Gelecek maç — normal beyaz
+        matchLabel.setStyle("-fx-text-fill: white; "
+                + "-fx-font-size: 13px; -fx-padding: 3px 0;");
+    }
+
+    weekBox.getChildren().add(matchLabel);
+});
 
                     mainContainer.getChildren().add(weekBox);
                 });
