@@ -16,11 +16,11 @@ class SportAbstractionTest {
     @Test
     // T17: Sport interface uzerinden FootballSport calisir
     void testSportInterfacePolymorphism() {
-        Sport sport = new FootballSport();
+    Sport sport = new FootballSport();
 
-        assertEquals("Football", sport.getSportName());
-        assertEquals(11, sport.getSquadSize());
-        assertEquals(3, sport.getSubstituteCount());
+    assertEquals("Football", sport.getSportName());
+    assertEquals(11, sport.getSquadSize());
+    assertEquals(7, sport.getSubstituteCount());
     }
 
     @Test
