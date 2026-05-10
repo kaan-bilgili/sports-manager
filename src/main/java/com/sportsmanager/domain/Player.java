@@ -35,6 +35,21 @@ public abstract class Player implements Serializable {
         this.injured = games > 0;
     }
 
+    public void train() {
+    if (injured) return;
+    
+    int gain;
+    if (skillLevel < 60) {
+        gain = 2 + new java.util.Random().nextInt(3); // 2-4
+    } else if (skillLevel < 80) {
+        gain = 1 + new java.util.Random().nextInt(3); // 1-3
+    } else {
+        gain = new java.util.Random().nextInt(2); // 0-1
+    }
+    
+    skillLevel = Math.min(99, skillLevel + gain);
+}
+
     public void decrementInjury() {
         if (injuryGamesRemaining > 0) {
             injuryGamesRemaining--;
