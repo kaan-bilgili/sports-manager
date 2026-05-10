@@ -1,11 +1,13 @@
 package com.sportsmanager.engine;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 import com.sportsmanager.domain.League;
 import com.sportsmanager.domain.Match;
+import com.sportsmanager.domain.Player;
 import com.sportsmanager.domain.Season;
 import com.sportsmanager.domain.StandingEntry;
 import com.sportsmanager.domain.Team;
@@ -253,4 +255,53 @@ public class GameFacade implements Serializable {
     }
 
     public void resetTrainings() { trainingsLeft = 3; }
+
+    private com.sportsmanager.football.Tactic currentTactic =
+        com.sportsmanager.football.Tactic.F442;
+
+    private com.sportsmanager.basketball.BasketballTactic currentBasketballTactic =
+        com.sportsmanager.basketball.BasketballTactic.BALANCED;
+
+public com.sportsmanager.football.Tactic getCurrentTactic() {
+    return currentTactic;
+}
+
+public void setTactic(com.sportsmanager.football.Tactic tactic) {
+    this.currentTactic = tactic;
+}
+
+public com.sportsmanager.basketball.BasketballTactic
+getCurrentBasketballTactic() {
+    return currentBasketballTactic;
+}
+
+public void setBasketballTactic(
+        com.sportsmanager.basketball.BasketballTactic tactic) {
+    this.currentBasketballTactic = tactic;
+}
+
+public List<Player> getStartingXI(Team team) {
+    if (sport.getSportName().equals("Football")) {
+        return com.sportsmanager.football.TacticService
+                .getStartingXI(team, currentTactic);
+    }
+    if (team instanceof com.sportsmanager.basketball.BasketballTeam) {
+    return com.sportsmanager.basketball.BasketballTacticService
+            .getStarters(team, currentBasketballTactic);
+}
+    return new ArrayList<>();
+}
+
+public List<Player> getBench(Team team) {
+    if (sport.getSportName().equals("Football")) {
+        return com.sportsmanager.football.TacticService
+                .getBench(team, currentTactic);
+    }
+    if (team instanceof com.sportsmanager.basketball.BasketballTeam) {
+    return com.sportsmanager.basketball.BasketballTacticService
+            .getBench(team, currentBasketballTactic);
+}
+    return new ArrayList<>();
+}
+
     }
