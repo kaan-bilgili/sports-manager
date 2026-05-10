@@ -1,13 +1,16 @@
 package com.sportsmanager.ui;
 
+import java.util.List;
+
 import com.sportsmanager.app.MainApp;
 import com.sportsmanager.domain.Player;
 import com.sportsmanager.domain.Team;
 import com.sportsmanager.engine.GameFacade;
+
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -15,8 +18,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-
-import java.util.List;
 
 public class TeamManagementScreen {
 
@@ -27,7 +28,12 @@ public class TeamManagementScreen {
 
     public TeamManagementScreen(GameFacade facade) {
         this.facade = facade;
-        this.selectedTeam = facade.getLeague().getTeams().get(0);
+        // our teams come by default
+        if (facade.getPlayerTeam() != null) {
+            this.selectedTeam = facade.getPlayerTeam();
+        } else {
+            this.selectedTeam = facade.getLeague().getTeams().get(0);
+        }
         buildUI();
     }
 
@@ -82,10 +88,12 @@ public class TeamManagementScreen {
             });
 
             btn.setOnMouseEntered(e -> {
-                if (btn != activeTeamBtn) btn.setStyle(AppStyle.BTN_HOVER);
+                if (btn != activeTeamBtn)
+                    btn.setStyle(AppStyle.BTN_HOVER);
             });
             btn.setOnMouseExited(e -> {
-                if (btn != activeTeamBtn) btn.setStyle(AppStyle.BTN_NORMAL);
+                if (btn != activeTeamBtn)
+                    btn.setStyle(AppStyle.BTN_NORMAL);
             });
 
             box.getChildren().add(btn);
@@ -107,95 +115,164 @@ public class TeamManagementScreen {
     }
 
     private VBox buildPlayerTable() {
-        VBox container = new VBox(10);
-        container.setPadding(new Insets(15));
+    VBox container = new VBox(10);
+    container.setPadding(new Insets(15));
 
-        boolean isFootball = selectedTeam instanceof
-                com.sportsmanager.football.FootballTeam;
-        boolean isBasketball = selectedTeam instanceof
-                com.sportsmanager.basketball.BasketballTeam;
+    boolean isFootball = selectedTeam instanceof
+            com.sportsmanager.football.FootballTeam;
+    boolean isBasketball = selectedTeam instanceof
+            com.sportsmanager.basketball.BasketballTeam;
+    boolean isPlayerTeam = facade.getPlayerTeam() != null &&
+            selectedTeam.getName().equals(
+                    facade.getPlayerTeam().getName());
 
-        int totalSize = selectedTeam.getPlayers().size();
-        int availableSize = selectedTeam.getAvailablePlayers().size();
-        int injuredSize = totalSize - availableSize;
-        int matchdaySize = isFootball ? 18 : isBasketball ? 12 : totalSize;
-        int starterSize = isFootball ? 11 : isBasketball ? 5 : totalSize;
-        int benchSize = isFootball ? 7 : isBasketball ? 7 : 0;
+    int totalSize = selectedTeam.getPlayers().size();
+    int availableSize = selectedTeam.getAvailablePlayers().size();
+    int injuredSize = totalSize - availableSize;
+    int matchdaySize = isFootball ? 18 : isBasketball ? 12 : totalSize;
+    int starterSize = isFootball ? 11 : isBasketball ? 5 : totalSize;
+    int benchSize = isFootball ? 7 : isBasketball ? 7 : 0;
 
-        HBox info = new HBox(15);
-        info.setAlignment(Pos.CENTER_LEFT);
+    HBox info = new HBox(15);
+    info.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
 
-        addInfoLabel(info, "Total: " + totalSize, "white");
-        addInfoLabel(info, "Matchday: " + matchdaySize, AppStyle.ACCENT_BLUE);
-        addInfoLabel(info, "Starting: " + starterSize, AppStyle.ACCENT_GREEN);
-        addInfoLabel(info, "Bench: " + benchSize, "#FFE0B2");
-        addInfoLabel(info, "Injured: " + injuredSize, AppStyle.ACCENT_CORAL);
+    addInfoLabel(info, "Total: " + totalSize, "white");
+    addInfoLabel(info, "Matchday: " + matchdaySize, AppStyle.ACCENT_BLUE);
+    addInfoLabel(info, "Starting: " + starterSize, AppStyle.ACCENT_GREEN);
+    addInfoLabel(info, "Bench: " + benchSize, "#FFE0B2");
+    addInfoLabel(info, "Injured: " + injuredSize, AppStyle.ACCENT_CORAL);
 
-        TableView<Player> table = new TableView<>();
-        table.setStyle("-fx-background-color: " + AppStyle.BG_PANEL + ";");
-        table.setPrefHeight(500);
-
-        TableColumn<Player, String> nameCol = new TableColumn<>("Name");
-        nameCol.setCellValueFactory(d ->
-                new SimpleStringProperty(d.getValue().getName()));
-        nameCol.setPrefWidth(140);
-
-        TableColumn<Player, String> posCol = new TableColumn<>("Position");
-        posCol.setCellValueFactory(d ->
-                new SimpleStringProperty(d.getValue().getPosition()));
-        posCol.setPrefWidth(130);
-
-        TableColumn<Player, Integer> skillCol = new TableColumn<>("Skill");
-        skillCol.setCellValueFactory(d ->
-                new SimpleIntegerProperty(
-                        d.getValue().getSkillLevel()).asObject());
-        skillCol.setPrefWidth(60);
-
-        TableColumn<Player, String> roleCol = new TableColumn<>("Role");
-        roleCol.setPrefWidth(110);
-        roleCol.setCellValueFactory(d -> {
-            Player player = d.getValue();
-            if (player.isInjured()) return new SimpleStringProperty("🤕 Injured");
-
-            List<Player> starters;
-            List<Player> bench;
-
-            if (isBasketball) {
-                com.sportsmanager.basketball.BasketballTeam bt =
-                        (com.sportsmanager.basketball.BasketballTeam) selectedTeam;
-                starters = bt.getStarters();
-                bench = bt.getBench();
-            } else if (isFootball) {
-                com.sportsmanager.football.FootballTeam ft =
-                        (com.sportsmanager.football.FootballTeam) selectedTeam;
-                starters = ft.getStartingXI();
-                bench = ft.getBench();
-            } else {
-                return new SimpleStringProperty("Unknown");
-            }
-
-            if (starters.contains(player))
-                return new SimpleStringProperty("✅ Starting");
-            else if (bench.contains(player))
-                return new SimpleStringProperty("🔄 Bench");
-            else
-                return new SimpleStringProperty("❌ Excluded");
-        });
-
-        TableColumn<Player, String> statusCol = new TableColumn<>("Status");
-        statusCol.setCellValueFactory(d ->
-                new SimpleStringProperty(d.getValue().isInjured()
-                        ? "INJURED (" + d.getValue()
-                                .getInjuryGamesRemaining() + ")"
-                        : "Available"));
-        statusCol.setPrefWidth(130);
-
-        table.getColumns().addAll(nameCol, posCol, skillCol, roleCol, statusCol);
-        table.getItems().addAll(selectedTeam.getPlayers());
-
-        container.getChildren().addAll(info, table);
-        return container;
+    // Training hakkı — sadece kendi takımında
+    if (isPlayerTeam) {
+        Label trainingLbl = new Label(
+                "🏋️ " + facade.getTrainingsLeft() + " trainings left");
+        trainingLbl.setStyle("-fx-text-fill: " + AppStyle.ACCENT_ORANGE
+                + "; -fx-font-size: 13px; -fx-font-weight: bold;");
+        info.getChildren().add(trainingLbl);
     }
+
+    TableView<Player> table = new TableView<>();
+    table.setStyle("-fx-background-color: " + AppStyle.BG_PANEL + ";");
+    table.setPrefHeight(470);
+
+    TableColumn<Player, String> nameCol = new TableColumn<>("Name");
+    nameCol.setCellValueFactory(d ->
+            new SimpleStringProperty(d.getValue().getName()));
+    nameCol.setPrefWidth(140);
+
+    TableColumn<Player, String> posCol = new TableColumn<>("Position");
+    posCol.setCellValueFactory(d ->
+            new SimpleStringProperty(d.getValue().getPosition()));
+    posCol.setPrefWidth(120);
+
+    TableColumn<Player, Integer> skillCol = new TableColumn<>("Skill");
+    skillCol.setCellValueFactory(d ->
+            new SimpleIntegerProperty(
+                    d.getValue().getSkillLevel()).asObject());
+    skillCol.setPrefWidth(55);
+
+    TableColumn<Player, String> roleCol = new TableColumn<>("Role");
+    roleCol.setPrefWidth(100);
+    roleCol.setCellValueFactory(d -> {
+        Player player = d.getValue();
+        if (player.isInjured()) return new SimpleStringProperty("🤕 Injured");
+
+        List<Player> starters;
+        List<Player> bench;
+
+        if (isBasketball) {
+            com.sportsmanager.basketball.BasketballTeam bt =
+                    (com.sportsmanager.basketball.BasketballTeam) selectedTeam;
+            starters = bt.getStarters();
+            bench = bt.getBench();
+        } else if (isFootball) {
+            com.sportsmanager.football.FootballTeam ft =
+                    (com.sportsmanager.football.FootballTeam) selectedTeam;
+            starters = ft.getStartingXI();
+            bench = ft.getBench();
+        } else {
+            return new SimpleStringProperty("Unknown");
+        }
+
+        if (starters.contains(player)) return new SimpleStringProperty("✅ Starting");
+        else if (bench.contains(player)) return new SimpleStringProperty("🔄 Bench");
+        else return new SimpleStringProperty("❌ Excluded");
+    });
+
+    TableColumn<Player, String> statusCol = new TableColumn<>("Status");
+    statusCol.setCellValueFactory(d ->
+            new SimpleStringProperty(d.getValue().isInjured()
+                    ? "INJURED (" + d.getValue()
+                            .getInjuryGamesRemaining() + ")"
+                    : "Available"));
+    statusCol.setPrefWidth(110);
+
+    table.getColumns().addAll(nameCol, posCol, skillCol, roleCol, statusCol);
+
+    // Train butonu — sadece kendi takımında
+    if (isPlayerTeam) {
+        TableColumn<Player, Void> trainCol = new TableColumn<>("Train");
+        trainCol.setPrefWidth(80);
+        trainCol.setCellFactory(col ->
+                new javafx.scene.control.TableCell<>() {
+                    private final Button trainBtn = new Button("Train");
+                    {
+                        trainBtn.setStyle(
+                                "-fx-background-color: " + AppStyle.ACCENT_GREEN
+                                + "; -fx-text-fill: #0F172A; "
+                                + "-fx-font-size: 11px; "
+                                + "-fx-cursor: hand;");
+                        trainBtn.setOnAction(e -> {
+                            Player player = getTableView()
+                                    .getItems().get(getIndex());
+                            if (!facade.canTrain()) {
+                                new Alert(Alert.AlertType.WARNING,
+                                        "No trainings left this week!")
+                                        .show();
+                                return;
+                            }
+                            if (player.isInjured()) {
+                                new Alert(Alert.AlertType.WARNING,
+                                        "Injured players cannot train!")
+                                        .show();
+                                return;
+                            }
+                            int oldSkill = player.getSkillLevel();
+                            player.train();
+                            facade.useTraining();
+                            int gain = player.getSkillLevel() - oldSkill;
+
+                            // Refresh
+                            view.setCenter(buildPlayerTable());
+
+                            new Alert(Alert.AlertType.INFORMATION,
+                                    player.getName() + " trained! +"
+                                    + gain + " skill → "
+                                    + player.getSkillLevel()).show();
+                        });
+                    }
+
+                    @Override
+                    protected void updateItem(Void item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty) {
+                            setGraphic(null);
+                        } else {
+                            Player player = getTableView()
+                                    .getItems().get(getIndex());
+                            trainBtn.setDisable(player.isInjured()
+                                    || !facade.canTrain());
+                            setGraphic(trainBtn);
+                        }
+                    }
+                });
+        table.getColumns().add(trainCol);
+    }
+
+    table.getItems().addAll(selectedTeam.getPlayers());
+    container.getChildren().addAll(info, table);
+    return container;
+}
 
     private void addInfoLabel(HBox box, String text, String color) {
         Label lbl = new Label(text);

@@ -21,66 +21,74 @@ public class GameFacade implements Serializable {
     private Team playerTeam;
     private transient Random random = new Random();
 
-   private static final String[] FOOTBALL_TEAM_NAMES = {
-    "🦅 Galatasaray",
-    "🦁 Fenerbahce",
-    "🦋 Besiktas",
-    "⚡ Trabzonspor",
-    "🌊 Basaksehir",
-    "🔥 Sivasspor",
-    "🌙 Alanyaspor",
-    "🐯 Antalyaspor"
-};
+    private static final String[] FOOTBALL_TEAM_NAMES = {
+            "🦁 Galatasaray",
+            "🐤 Fenerbahce",
+            "🦅 Besiktas",
+            "⚡ Trabzonspor",
+            "🌊 Basaksehir",
+            "🔥 Sivasspor",
+            "🌙 Alanyaspor",
+            "🐯 Antalyaspor"
+    };
 
-private static final String[] BASKETBALL_TEAM_NAMES = {
-    "🏆 Lakers",
-    "🍀 Celtics",
-    "🐂 Bulls",
-    "⚔️ Warriors",
-    "🗽 Knicks",
-    "🌡️ Heat",
-    "🤠 Spurs",
-    "🕸️ Nets"
-};
-
+    private static final String[] BASKETBALL_TEAM_NAMES = {
+            "🏆 Lakers",
+            "🍀 Celtics",
+            "🐂 Bulls",
+            "⚔️ Warriors",
+            "🗽 Knicks",
+            "🌡️ Heat",
+            "🤠 Spurs",
+            "🕸️ Nets"
+    };
 
     private static final String[] PLAYER_NAMES = {
-    // Erkek
-    "Ali", "Mehmet", "Ahmet", "Mustafa", "Hasan",
-    "Huseyin", "Ibrahim", "Murat", "Emre", "Burak",
-    // Kadın
-    "Zeynep", "Ayse", "Fatma", "Elif", "Selin",
-    "Merve", "Ceren", "Deniz", "Nisan", "Yaren"
-};
+
+            "Ali", "Mehmet", "Ahmet", "Mustafa", "Hasan",
+            "Huseyin", "Ibrahim", "Murat", "Emre", "Burak",
+            "Can", "Ozan", "Kerem", "Tuna", "Ege",
+            "Kaan", "Berk", "Onur", "Serkan", "Tolga",
+            "Umut", "Yigit", "Doruk", "Batuhan", "Arda",
+            "Mert", "Baris", "Cenk", "Furkan", "Deniz",
+            "Mateo", "Lorenzo", "Marco", "Adrian", "Victor",
+            "Nico", "Ruben", "Thiago", "Andre", "Felix",
+            "Dario", "Sandro", "Enzo", "Raul", "Bruno",
+            "Milan", "Tomas", "Leon", "Oscar", "Diego",
+            "Hugo", "Javier", "Pablo", "Alvaro", "Sergi",
+            "Ricardo", "Daniel", "Matias", "Gabriel", "Samuel",
+            "Ivan", "Damian", "Alex", "Martin", "Julian",
+            "Noah", "Elias", "Lucas", "Jonas", "Anton"
+    };
 
     public GameFacade(Sport sport) {
         this.sport = sport;
     }
 
     public void initGame(int teamCount) {
-    league = new League(sport.getSportName() + " League",
-            sport.getSportName());
+        league = new League(sport.getSportName() + " League",
+                sport.getSportName());
 
-    boolean isBasketball = sport.getSportName().equals("Basketball");
-    String[] teamNames = isBasketball
-            ? BASKETBALL_TEAM_NAMES
-            : FOOTBALL_TEAM_NAMES;
+        boolean isBasketball = sport.getSportName().equals("Basketball");
+        String[] teamNames = isBasketball
+                ? BASKETBALL_TEAM_NAMES
+                : FOOTBALL_TEAM_NAMES;
 
-    for (int i = 0; i < teamCount && i < teamNames.length; i++) {
-        Team team = sport.createTeam(teamNames[i]);
-        generatePlayers(team);
-        league.addTeam(team);
+        for (int i = 0; i < teamCount && i < teamNames.length; i++) {
+            Team team = sport.createTeam(teamNames[i]);
+            generatePlayers(team);
+            league.addTeam(team);
+        }
+
+        FixtureGenerator generator = new FixtureGenerator(sport);
+        league.setFixture(generator.generate(league.getTeams()));
+        season = new Season(1, league);
+
+        System.out.println("Game initialized: " + league.getName());
+        System.out.println("Teams: " + league.getTeams().size());
+        System.out.println("Total matches: "
+                + league.getFixture().getTotalMatchCount());
     }
-
-    FixtureGenerator generator = new FixtureGenerator(sport);
-    league.setFixture(generator.generate(league.getTeams()));
-    season = new Season(1, league);
-
-    System.out.println("Game initialized: " + league.getName());
-    System.out.println("Teams: " + league.getTeams().size());
-    System.out.println("Total matches: "
-            + league.getFixture().getTotalMatchCount());
-}
 
     public void setPlayerTeam(Team team) {
         this.playerTeam = team;
@@ -132,58 +140,58 @@ private static final String[] BASKETBALL_TEAM_NAMES = {
     }
 
     private void generateFootballPlayers(Team team) {
-    if (random == null) random = new Random();
+        if (random == null)
+            random = new Random();
 
-    // 22 oyuncu: 2 GK, 7 DEF, 7 MID, 6 FWD
-    String[] balanced = {
-        "GOALKEEPER", "GOALKEEPER",
-        "DEFENDER", "DEFENDER", "DEFENDER", "DEFENDER",
-        "DEFENDER", "DEFENDER", "DEFENDER",
-        "MIDFIELDER", "MIDFIELDER", "MIDFIELDER", "MIDFIELDER",
-        "MIDFIELDER", "MIDFIELDER", "MIDFIELDER",
-        "FORWARD", "FORWARD", "FORWARD",
-        "FORWARD", "FORWARD", "FORWARD"
-    };
+        // 22 oyuncu: 2 GK, 7 DEF, 7 MID, 6 FWD
+        String[] balanced = {
+                "GOALKEEPER", "GOALKEEPER",
+                "DEFENDER", "DEFENDER", "DEFENDER", "DEFENDER",
+                "DEFENDER", "DEFENDER", "DEFENDER",
+                "MIDFIELDER", "MIDFIELDER", "MIDFIELDER", "MIDFIELDER",
+                "MIDFIELDER", "MIDFIELDER", "MIDFIELDER",
+                "FORWARD", "FORWARD", "FORWARD",
+                "FORWARD", "FORWARD", "FORWARD"
+        };
 
-    for (int i = 0; i < 22; i++) {
-        String name = PLAYER_NAMES[random.nextInt(PLAYER_NAMES.length)]
-                + " " + (i + 1);
-        int age = 18 + random.nextInt(20);
-        int skill = 50 + random.nextInt(50);
+        for (int i = 0; i < 22; i++) {
+            String name = PLAYER_NAMES[random.nextInt(PLAYER_NAMES.length)]
+                    + " " + (i + 1);
+            int age = 18 + random.nextInt(20);
+            int skill = 50 + random.nextInt(50);
 
-        com.sportsmanager.football.FootballPlayer.Position pos =
-                com.sportsmanager.football.FootballPlayer.Position
-                        .valueOf(balanced[i]);
-        team.addPlayer(new com.sportsmanager.football.FootballPlayer(
-                name, age, skill, pos));
+            com.sportsmanager.football.FootballPlayer.Position pos = com.sportsmanager.football.FootballPlayer.Position
+                    .valueOf(balanced[i]);
+            team.addPlayer(new com.sportsmanager.football.FootballPlayer(
+                    name, age, skill, pos));
+        }
     }
-}
 
-private void generateBasketballPlayers(Team team) {
-    if (random == null) random = new Random();
+    private void generateBasketballPlayers(Team team) {
+        if (random == null)
+            random = new Random();
 
-    // 15 oyuncu: 3 PG, 3 SG, 3 SF, 3 PF, 3 C
-    String[] balanced = {
-        "POINT_GUARD", "POINT_GUARD", "POINT_GUARD",
-        "SHOOTING_GUARD", "SHOOTING_GUARD", "SHOOTING_GUARD",
-        "SMALL_FORWARD", "SMALL_FORWARD", "SMALL_FORWARD",
-        "POWER_FORWARD", "POWER_FORWARD", "POWER_FORWARD",
-        "CENTER", "CENTER", "CENTER"
-    };
+        // 15 oyuncu: 3 PG, 3 SG, 3 SF, 3 PF, 3 C
+        String[] balanced = {
+                "POINT_GUARD", "POINT_GUARD", "POINT_GUARD",
+                "SHOOTING_GUARD", "SHOOTING_GUARD", "SHOOTING_GUARD",
+                "SMALL_FORWARD", "SMALL_FORWARD", "SMALL_FORWARD",
+                "POWER_FORWARD", "POWER_FORWARD", "POWER_FORWARD",
+                "CENTER", "CENTER", "CENTER"
+        };
 
-    for (int i = 0; i < 15; i++) {
-        String name = PLAYER_NAMES[random.nextInt(PLAYER_NAMES.length)]
-                + " " + (i + 1);
-        int age = 18 + random.nextInt(20);
-        int skill = 50 + random.nextInt(50);
+        for (int i = 0; i < 15; i++) {
+            String name = PLAYER_NAMES[random.nextInt(PLAYER_NAMES.length)]
+                    + " " + (i + 1);
+            int age = 18 + random.nextInt(20);
+            int skill = 50 + random.nextInt(50);
 
-        com.sportsmanager.basketball.BasketballPlayer.Position pos =
-                com.sportsmanager.basketball.BasketballPlayer.Position
-                        .valueOf(balanced[i]);
-        team.addPlayer(new com.sportsmanager.basketball.BasketballPlayer(
-                name, age, skill, pos));
+            com.sportsmanager.basketball.BasketballPlayer.Position pos = com.sportsmanager.basketball.BasketballPlayer.Position
+                    .valueOf(balanced[i]);
+            team.addPlayer(new com.sportsmanager.basketball.BasketballPlayer(
+                    name, age, skill, pos));
+        }
     }
-}
 
     public void advanceWeek() {
         if (season == null) {
@@ -233,4 +241,16 @@ private void generateBasketballPlayers(Team team) {
     public Season getSeason() {
         return season;
     }
-}
+
+    private int trainingsLeft = 3;
+
+    public int getTrainingsLeft() { return trainingsLeft; }
+
+    public boolean canTrain() { return trainingsLeft > 0; }
+
+    public void useTraining() {
+        if (trainingsLeft > 0) trainingsLeft--;
+    }
+
+    public void resetTrainings() { trainingsLeft = 3; }
+    }

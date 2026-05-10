@@ -5,6 +5,7 @@ import com.sportsmanager.domain.Match;
 import com.sportsmanager.domain.StandingEntry;
 import com.sportsmanager.engine.GameFacade;
 import com.sportsmanager.engine.GameSaveManager;
+
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
@@ -93,6 +94,7 @@ public class LeagueDashboardScreen {
             } else {
                 facade.getSeason().nextWeek();
                 view.setTop(buildHeader());
+                facade.resetTrainings();
                 view.setCenter(buildStandings());
             }
         });

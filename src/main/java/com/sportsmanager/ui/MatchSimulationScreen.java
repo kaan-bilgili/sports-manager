@@ -426,6 +426,7 @@ public class MatchSimulationScreen {
                         + "-fx-text-fill: white; -fx-font-size: 14px; "
                         + "-fx-cursor: hand; -fx-font-weight: bold;"));
         continueBtn.setOnAction(e -> {
+            facade.resetTrainings();
             LeagueDashboardScreen dashboard = new LeagueDashboardScreen(facade);
             javafx.scene.Scene scene = new javafx.scene.Scene(
                     dashboard.getView(), 900, 650);
