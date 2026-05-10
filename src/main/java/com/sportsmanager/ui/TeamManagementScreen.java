@@ -142,7 +142,7 @@ public class TeamManagementScreen {
     addInfoLabel(info, "Bench: " + benchSize, "#FFE0B2");
     addInfoLabel(info, "Injured: " + injuredSize, AppStyle.ACCENT_CORAL);
 
-    // Training hakkı — sadece kendi takımında
+    // Training hakkı — sadece kendi takımında olyuyor
     if (isPlayerTeam) {
         Label trainingLbl = new Label(
                 "🏋️ " + facade.getTrainingsLeft() + " trainings left");
@@ -174,30 +174,19 @@ public class TeamManagementScreen {
     TableColumn<Player, String> roleCol = new TableColumn<>("Role");
     roleCol.setPrefWidth(100);
     roleCol.setCellValueFactory(d -> {
-        Player player = d.getValue();
-        if (player.isInjured()) return new SimpleStringProperty("🤕 Injured");
+    Player player = d.getValue();
+    if (player.isInjured()) return new SimpleStringProperty("🤕 Injured");
 
-        List<Player> starters;
-        List<Player> bench;
+    List<Player> starters = facade.getStartingXI(selectedTeam);
+    List<Player> bench = facade.getBench(selectedTeam);
 
-        if (isBasketball) {
-            com.sportsmanager.basketball.BasketballTeam bt =
-                    (com.sportsmanager.basketball.BasketballTeam) selectedTeam;
-            starters = bt.getStarters();
-            bench = bt.getBench();
-        } else if (isFootball) {
-            com.sportsmanager.football.FootballTeam ft =
-                    (com.sportsmanager.football.FootballTeam) selectedTeam;
-            starters = ft.getStartingXI();
-            bench = ft.getBench();
-        } else {
-            return new SimpleStringProperty("Unknown");
-        }
-
-        if (starters.contains(player)) return new SimpleStringProperty("✅ Starting");
-        else if (bench.contains(player)) return new SimpleStringProperty("🔄 Bench");
-        else return new SimpleStringProperty("❌ Excluded");
-    });
+    if (starters.contains(player))
+        return new SimpleStringProperty("✅ Starting");
+    else if (bench.contains(player))
+        return new SimpleStringProperty("🔄 Bench");
+    else
+        return new SimpleStringProperty("❌ Excluded");
+});
 
     TableColumn<Player, String> statusCol = new TableColumn<>("Status");
     statusCol.setCellValueFactory(d ->
@@ -268,6 +257,81 @@ public class TeamManagementScreen {
                 });
         table.getColumns().add(trainCol);
     }
+    // Tactic ComboBox — sadece football + kendi takımı
+if (isPlayerTeam && isFootball) {
+    javafx.scene.control.ComboBox<com.sportsmanager.football.Tactic> tacticBox =
+            new javafx.scene.control.ComboBox<>();
+    tacticBox.getItems().addAll(
+            com.sportsmanager.football.Tactic.values());
+    tacticBox.setValue(facade.getCurrentTactic());
+    tacticBox.setStyle(
+        "-fx-background-color: " + "white" + "; "
+        + "-fx-border-color: " + AppStyle.ACCENT_BLUE + "; "
+        + "-fx-border-width: 1px; "
+        + "-fx-mark-color: white;");
+
+    Label tacticLabel = new Label("Tactic:");
+    tacticLabel.setStyle("-fx-text-fill: " + AppStyle.ACCENT_BLUE
+            + "; -fx-font-size: 13px; -fx-font-weight: bold;");
+
+    tacticBox.setOnAction(e -> {
+        facade.setTactic(tacticBox.getValue());
+        view.setCenter(buildPlayerTable());
+    });
+
+    HBox tacticRow = new HBox(10, tacticLabel, tacticBox);
+    tacticRow.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+    container.getChildren().add(tacticRow);
+}
+if (isPlayerTeam && isBasketball) {
+    javafx.scene.control.ComboBox<
+            com.sportsmanager.basketball.BasketballTactic> tacticBox =
+            new javafx.scene.control.ComboBox<>();
+
+    tacticBox.getItems().addAll(
+            com.sportsmanager.basketball.BasketballTactic.values());
+
+    tacticBox.setValue(
+            facade.getCurrentBasketballTactic());
+
+    tacticBox.setStyle(
+            "-fx-background-color: " + AppStyle.BG_PANEL + "; "
+            + "-fx-border-color: " + AppStyle.ACCENT_BLUE + "; "
+            + "-fx-border-width: 1px;");
+
+    tacticBox.setButtonCell(
+            new javafx.scene.control.ListCell<>() {
+        @Override
+        protected void updateItem(
+                com.sportsmanager.basketball.BasketballTactic item,
+                boolean empty) {
+            super.updateItem(item, empty);
+            setText(empty || item == null
+                    ? null
+                    : item.toString());
+            setStyle("-fx-text-fill: white;");
+        }
+    });
+
+    Label tacticLabel = new Label("Play Style:");
+    tacticLabel.setStyle(
+            "-fx-text-fill: " + AppStyle.ACCENT_BLUE
+                    + "; -fx-font-size: 13px;"
+                    + " -fx-font-weight: bold;");
+
+    tacticBox.setOnAction(e -> {
+        facade.setBasketballTactic(
+                tacticBox.getValue());
+        view.setCenter(buildPlayerTable());
+    });
+
+    HBox tacticRow = new HBox(10, tacticLabel, tacticBox);
+    tacticRow.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+
+    container.getChildren().add(tacticRow);
+}
+
+
 
     table.getItems().addAll(selectedTeam.getPlayers());
     container.getChildren().addAll(info, table);
