@@ -107,19 +107,25 @@ public class MatchSimulationScreen {
                 + "-fx-padding: 15px; -fx-background-radius: 8px;");
 
         // Score
+        int fontSize = (match.getHomeScore() >= 100 || match.getAwayScore() >= 100)
+                ? 28
+                : 42;
+
         Label homeScore = new Label(String.valueOf(match.getHomeScore()));
-        homeScore.setStyle("-fx-text-fill: #e94560; -fx-font-size: 42px; "
-                + "-fx-font-weight: bold;");
+        homeScore.setStyle("-fx-text-fill: #e94560; -fx-font-size: "
+                + fontSize + "px; -fx-font-weight: bold;");
 
         Label dash = new Label("—");
-        dash.setStyle("-fx-text-fill: white; -fx-font-size: 28px;");
+        dash.setStyle("-fx-text-fill: white; -fx-font-size: "
+                + (fontSize - 10) + "px;");
 
         Label awayScore = new Label(String.valueOf(match.getAwayScore()));
-        awayScore.setStyle("-fx-text-fill: #4fc3f7; -fx-font-size: 42px; "
-                + "-fx-font-weight: bold;");
+        awayScore.setStyle("-fx-text-fill: #4fc3f7; -fx-font-size: "
+                + fontSize + "px; -fx-font-weight: bold;");
 
         HBox scoreBox = new HBox(8, homeScore, dash, awayScore);
         scoreBox.setAlignment(Pos.CENTER);
+        scoreBox.setMinWidth(180);
 
         Label resultLabel;
         if (match.isDraw()) {
